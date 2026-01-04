@@ -33,62 +33,12 @@ function getLogLevel(env: AppEnv): LogLevel {
 }
 
 function getTransports(env: AppEnv): winston.transport[] {
-  switch (env) {
-    case APP_ENV.TEST:
-      return [
-        new winston.transports.Console({
-          silent: true,
-        }),
-      ];
-
-    case APP_ENV.LOCAL:
-      return [
-        new winston.transports.Console({
-          format: localFormat(),
-        }),
-      ];
-
-    case APP_ENV.DEVELOPMENT:
-    case APP_ENV.PRODUCTION:
-    default:
-      return [
-        new winston.transports.Console({
-          format: productionFormat(),
-        }),
-        new winston.transports.File({
-          filename: 'logs/error.log',
-          level: LOG_LEVEL.ERROR,
-          format: productionFormat(),
-        }),
-        new winston.transports.File({
-          filename: 'logs/combined.log',
-          format: productionFormat(),
-        }),
-      ];
-  }
-}
-
-type FileHandlersConfig = Pick<WinstonModuleOptions, 'exceptionHandlers' | 'rejectionHandlers'>;
-
-function getFileHandlers(env: AppEnv): Partial<FileHandlersConfig> {
-  if (env === APP_ENV.TEST || env === APP_ENV.LOCAL) {
-    return {};
+  if (env === APP_ENV.TEST) {
+    return [new winston.transports.Console({ silent: true })];
   }
 
-  return {
-    exceptionHandlers: [
-      new winston.transports.File({
-        filename: 'logs/exceptions.log',
-        format: productionFormat(),
-      }),
-    ],
-    rejectionHandlers: [
-      new winston.transports.File({
-        filename: 'logs/exceptions.log',
-        format: productionFormat(),
-      }),
-    ],
-  };
+  const format = env === APP_ENV.LOCAL ? localFormat() : productionFormat();
+  return [new winston.transports.Console({ format })];
 }
 
 export const loggerConfig: WinstonModuleOptions = (() => {
@@ -97,6 +47,5 @@ export const loggerConfig: WinstonModuleOptions = (() => {
   return {
     level: getLogLevel(env),
     transports: getTransports(env),
-    ...getFileHandlers(env),
   };
 })();

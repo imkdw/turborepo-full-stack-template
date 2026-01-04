@@ -1,10 +1,10 @@
-import { CallHandler, ExecutionContext, Inject, Injectable, NestInterceptor } from '@nestjs/common';
+import { CallHandler, ExecutionContext, HttpStatus, Inject, Injectable, NestInterceptor } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Observable, catchError, tap, throwError } from 'rxjs';
 import { Logger } from 'winston';
 
-import { APP_ENV, AppEnv, LOG_LEVEL, LogLevel } from '../logger/logger.const';
+import { APP_ENV, AppEnv, LOG_LEVEL, LogLevel } from '../logger';
 
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
@@ -59,8 +59,14 @@ export class LoggingInterceptor implements NestInterceptor {
   }
 
   private getLogLevel(statusCode: number): LogLevel {
-    if (statusCode >= 500) return LOG_LEVEL.ERROR;
-    if (statusCode >= 400) return LOG_LEVEL.WARN;
+    if (statusCode >= HttpStatus.INTERNAL_SERVER_ERROR) {
+      return LOG_LEVEL.ERROR;
+    }
+
+    if (statusCode >= HttpStatus.BAD_REQUEST) {
+      return LOG_LEVEL.WARN;
+    }
+
     return LOG_LEVEL.INFO;
   }
 
