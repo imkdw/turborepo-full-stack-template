@@ -30,6 +30,11 @@ tsconfig.tsbuildinfo
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
+
+# Logs
+logs/
+*.log
 
 # Misc
 .DS_Store

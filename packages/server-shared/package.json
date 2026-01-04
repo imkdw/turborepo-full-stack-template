@@ -1,0 +1,29 @@
+{
+  "name": "@repo/server-shared",
+  "version": "0.0.1",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint src/ --fix"
+  },
+  "dependencies": {
+    "@nestjs/common": "^11.0.1",
+    "@nestjs/core": "^11.0.1",
+    "winston": "^3.18.3",
+    "nest-winston": "^1.10.2",
+    "rxjs": "^7.8.1"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.13.0",
+    "eslint": "^9.18.0",
+    "typescript": "5.9.2"
+  }
+}
