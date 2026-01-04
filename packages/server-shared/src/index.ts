@@ -1,3 +1,4 @@
-export * from './logger';
-export * from './interceptor';
+export * from './config';
 export * from './filter';
+export * from './interceptor';
+export * from './logger';

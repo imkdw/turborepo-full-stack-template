@@ -4,6 +4,7 @@ import { ExceptionResponse } from '@repo/types';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 
+import { MyConfigService } from '../config';
 import { APP_ENV, AppEnv } from '../logger';
 
 @Catch()
@@ -12,9 +13,10 @@ export class AllExceptionFilter implements ExceptionFilter {
 
   constructor(
     private readonly httpAdapterHost: HttpAdapterHost,
-    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger
+    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
+    private readonly configService: MyConfigService
   ) {
-    this.env = (process.env.APP_ENV || process.env.NODE_ENV || APP_ENV.LOCAL) as AppEnv;
+    this.env = this.configService.get('APP_ENV');
   }
 
   catch(exception: unknown, host: ArgumentsHost): void {

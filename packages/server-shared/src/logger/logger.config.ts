@@ -11,10 +11,6 @@ export interface LoggerConfigOptions {
   loki?: Omit<LokiTransportOptions, 'app'>;
 }
 
-function getAppEnv(): AppEnv {
-  return (process.env.APP_ENV || process.env.NODE_ENV || APP_ENV.LOCAL) as AppEnv;
-}
-
 function localFormat(): winston.Logform.Format {
   return combine(
     timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
@@ -62,20 +58,9 @@ function getTransports(env: AppEnv, options?: LoggerConfigOptions): winston.tran
   return [new winston.transports.Console({ format: productionFormat() })];
 }
 
-export function createLoggerConfig(options?: LoggerConfigOptions): WinstonModuleOptions {
-  const env = getAppEnv();
-
+export function createLoggerConfig(env: AppEnv, options?: LoggerConfigOptions): WinstonModuleOptions {
   return {
     level: getLogLevel(env),
     transports: getTransports(env, options),
   };
 }
-
-export const loggerConfig: WinstonModuleOptions = (() => {
-  const env = getAppEnv();
-
-  return {
-    level: getLogLevel(env),
-    transports: getTransports(env),
-  };
-})();

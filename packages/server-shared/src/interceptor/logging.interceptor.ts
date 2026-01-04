@@ -4,14 +4,18 @@ import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Observable, catchError, tap, throwError } from 'rxjs';
 import { Logger } from 'winston';
 
+import { MyConfigService } from '../config';
 import { APP_ENV, AppEnv, LOG_LEVEL, LogLevel } from '../logger';
 
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
   private readonly env: AppEnv;
 
-  constructor(@Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger) {
-    this.env = (process.env.APP_ENV || process.env.NODE_ENV || APP_ENV.LOCAL) as AppEnv;
+  constructor(
+    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
+    private readonly configService: MyConfigService
+  ) {
+    this.env = this.configService.get('APP_ENV');
   }
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
