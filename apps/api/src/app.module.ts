@@ -1,3 +1,6 @@
+import { AppController } from '@/app.controller';
+import { DatabaseModule } from '@/infra/database';
+import { UserModule } from '@/modules/user/user.module';
 import { Module } from '@nestjs/common';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import {
@@ -13,6 +16,8 @@ import { WinstonModule } from 'nest-winston';
 @Module({
   imports: [
     MyConfigModule,
+    DatabaseModule,
+    UserModule,
     WinstonModule.forRootAsync({
       useFactory: (configService: MyConfigService) => {
         return createLoggerConfig(configService.get('APP_ENV'));
@@ -20,7 +25,7 @@ import { WinstonModule } from 'nest-winston';
       inject: [MyConfigService],
     }),
   ],
-  controllers: [],
+  controllers: [AppController],
   providers: [
     {
       provide: APP_FILTER,

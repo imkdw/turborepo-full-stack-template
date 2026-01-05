@@ -1,2 +1,2 @@
 export * from './exception-codes';
-export * from './auth';
+export * from './user-exception-codes';

@@ -1,0 +1,13 @@
+import { HttpStatus } from '@nestjs/common';
+import { CustomException } from '@repo/server-shared';
+import { EXCEPTION_CODES } from '@repo/exception';
+
+export class UserNotFoundException extends CustomException {
+  constructor(message: string) {
+    super({
+      message,
+      errorCode: EXCEPTION_CODES.USER_NOT_FOUND,
+      statusCode: HttpStatus.NOT_FOUND,
+    });
+  }
+}
