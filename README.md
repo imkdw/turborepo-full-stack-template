@@ -41,7 +41,7 @@ pnpm dev
 | `apps/api/.env`                   | `DATABASE_URL`의 DB명, 포트 등           |
 | `apps/api/prisma/schema/*.prisma` | 실제 도메인 모델로 교체                  |
 | `apps/web/src/messages/*.json`    | i18n 메시지                              |
-| `apps/app/app.json`               | `name`, `slug`, `bundleIdentifier` 등    |
+| `apps/mobile/app.json`            | `name`, `slug`, `bundleIdentifier` 등    |
 
 ### 선택 변경
 
@@ -56,7 +56,7 @@ pnpm dev
 ```bash
 # 개발
 pnpm dev                # 웹 + API 개발 서버
-pnpm dev:app            # 모바일 앱 (별도 실행)
+pnpm dev:mobile         # 모바일 앱 (별도 실행)
 
 # 빌드 & 검증
 pnpm build              # 전체 빌드
@@ -72,7 +72,7 @@ pnpm api prisma generate # Prisma 클라이언트 생성
 # 패키지별 실행
 pnpm api <명령어>       # API 패키지
 pnpm web <명령어>       # 웹 패키지
-pnpm app <명령어>       # 모바일 패키지
+pnpm mobile <명령어>    # 모바일 패키지
 ```
 
 ## 프로젝트 구조
@@ -81,7 +81,7 @@ pnpm app <명령어>       # 모바일 패키지
 apps/
   api/        # NestJS 11 백엔드 (Prisma, Swagger)
   web/        # Next.js 16 프론트엔드 (Turbopack, next-intl)
-  app/        # Expo 54 모바일 (Expo Router)
+  mobile/     # Expo 54 모바일 (Expo Router)
 
 packages/
   ui/                    # 공유 React 컴포넌트 (CVA, Tailwind)

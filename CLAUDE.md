@@ -4,19 +4,19 @@ This is a Turborepo monorepo with Next.js web frontend, NestJS backend API, and 
 
 ## Quick Reference
 
-| App     | Location   | Port     | Run            |
-| ------- | ---------- | -------- | -------------- |
-| API     | `apps/api` | 8000     | `pnpm dev`     |
-| Web     | `apps/web` | 3000     | `pnpm dev`     |
-| Mobile  | `apps/app` | -        | `pnpm dev:app` |
-| Swagger | -          | 8000/api | Auto with API  |
+| App     | Location      | Port     | Run               |
+| ------- | ------------- | -------- | ----------------- |
+| API     | `apps/api`    | 8000     | `pnpm dev`        |
+| Web     | `apps/web`    | 3000     | `pnpm dev`        |
+| Mobile  | `apps/mobile` | -        | `pnpm dev:mobile` |
+| Swagger | -             | 8000/api | Auto with API     |
 
 ## Commands
 
 ```bash
 # Development
 pnpm dev                    # Start API + Web (not mobile)
-pnpm dev:app                # Start mobile app separately
+pnpm dev:mobile             # Start mobile app separately
 pnpm build                  # Build all packages
 pnpm lint                   # Lint with auto-fix
 pnpm check-types            # TypeScript type check
@@ -52,7 +52,7 @@ apps/
       components/           # React components
       i18n/                 # Internationalization config
       messages/             # en.json, ko.json
-  app/                      # Expo 54 mobile app
+  mobile/                   # Expo 54 mobile app
 
 packages/
   ui/                       # Shared React components (CVA + Tailwind)
@@ -172,7 +172,7 @@ throw new CustomException({
 
 ### Building
 
-- Development: `pnpm app start`
+- Development: `pnpm mobile start`
 - Production: Use EAS Build (not local builds)
 
 ## Testing
@@ -244,7 +244,7 @@ SWAGGER_PASSWORD=xxx
 ## Performance Notes
 
 - Turborepo caches builds - use `turbo run build --force` to bypass
-- Dev excludes mobile by default (use `pnpm dev:app` separately)
+- Dev excludes mobile by default (use `pnpm dev:mobile` separately)
 - Prisma client auto-generates on install
 
 ## Troubleshooting
