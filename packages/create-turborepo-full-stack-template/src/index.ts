@@ -412,7 +412,7 @@ async function main(): Promise<void> {
       initial: DEFAULT_PROJECT_NAME,
       validate: (value: string) => {
         const result = validateProjectName(value);
-        return result.valid ? true : result.error || 'Invalid name';
+        return result.valid ? true : result.error ?? 'Invalid name';
       },
     });
 
