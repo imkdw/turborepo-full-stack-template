@@ -23,11 +23,17 @@
     "setup:local": "docker-compose up -d --wait && pnpm api prisma db push",
     "setup:test": "docker-compose up -d --wait && cd apps/api && pnpm dotenv -e ../../.env.test -- prisma db push --force-reset",
     "reset:test": "cd apps/api && pnpm dotenv -e ../../.env.test -- prisma db push --force-reset",
-    "prepare": "husky"
+    "prepare": "husky",
+    "create-app": "tsx scripts/create-app.ts"
   },
   "devDependencies": {
+    "@types/prompts": "^2.4.9",
     "husky": "^9.1.7",
+    "ora": "^9.0.0",
+    "picocolors": "^1.1.1",
     "prettier": "^3.6.2",
+    "prompts": "^2.4.2",
+    "tsx": "^4.21.0",
     "turbo": "^2.5.6",
     "typescript": "5.9.2"
   },

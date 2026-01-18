@@ -31,6 +31,11 @@ pnpm api prisma studio      # Open Prisma Studio
 pnpm api prisma generate    # Generate Prisma client
 pnpm api prisma db push     # Push schema changes
 
+# App Generator
+pnpm create-app <name> --from <template>  # Create new app from template
+pnpm create-app --list                    # List available templates
+pnpm create-app                           # Interactive mode
+
 # Package-specific (use pnpm <package> <command>)
 pnpm api test:unit          # API unit tests
 pnpm api test:integration   # API integration tests
@@ -68,6 +73,15 @@ packages/
     types/                  # Shared TypeScript types
     exception/              # Exception codes
     utils/                  # Shared utilities
+
+templates/                  # App templates for CLI generator
+  mobile/                   # Mobile template (@repo/template-mobile)
+  desktop/                  # Desktop template (@repo/template-desktop)
+  web/                      # Web template (@repo/template-web)
+  api/                      # API template (@repo/template-api)
+
+scripts/
+  create-app.ts             # CLI app generator
 ```
 
 ## Code Style
@@ -263,6 +277,28 @@ SWAGGER_PASSWORD=xxx
 
 1. Add keys to `apps/web/src/messages/en.json` and `ko.json`
 2. Use `useTranslations()` hook from `next-intl`
+
+### Add a new app using CLI generator
+
+1. Run `pnpm create-app` for interactive mode, or use CLI:
+   ```bash
+   pnpm create-app my-new-app --from mobile   # mobile, desktop, web, api
+   ```
+2. Available templates:
+   - `mobile` - Expo React Native mobile app
+   - `desktop` - Electron desktop app
+   - `web` - Next.js web app
+   - `api` - NestJS backend API
+3. The generator will:
+   - Copy template from `templates/`
+   - Update package.json name to `@repo/<app-name>`
+   - Update template-specific config (app.json, forge.config.ts, etc.)
+   - Add script to root package.json
+   - Run lint and build verification
+4. Options:
+   - `--dry-run` - Preview changes without creating files
+   - `--skip-install` - Skip pnpm install and verification
+   - `--list` - Show available templates
 
 ## Performance Notes
 

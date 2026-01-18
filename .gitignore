@@ -39,3 +39,12 @@ logs/
 # Misc
 .DS_Store
 *.pem
+
+# Templates build artifacts
+templates/*/node_modules
+templates/*/.turbo
+templates/*/.next
+templates/*/.expo
+templates/*/dist
+templates/*/out
+templates/*/.webpack
