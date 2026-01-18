@@ -28,9 +28,13 @@ pnpm dev
 - API: http://localhost:8000
 - Swagger: http://localhost:8000/api
 
+<br>
+
 ## 템플릿 커스터마이징
 
 복제 후 프로젝트에 맞게 수정해야 할 항목들:
+
+<br>
 
 ### 필수 변경
 
@@ -43,6 +47,8 @@ pnpm dev
 | `apps/my-web/src/messages/*.json`     | i18n 메시지                              |
 | `apps/my-app/app.json`                | `name`, `slug`, `bundleIdentifier` 등    |
 
+<br>
+
 ### 선택 변경
 
 | 파일                         | 변경 항목      |
@@ -50,6 +56,8 @@ pnpm dev
 | `packages/shared/exception/` | 에러 코드 정의 |
 | `packages/shared/consts/`    | 공유 상수      |
 | `.husky/pre-push`            | Git hook 설정  |
+
+<br>
 
 ## 앱 생성 (CLI)
 
@@ -92,6 +100,8 @@ pnpm create-app new-api --from api
 - 루트 `package.json`에 `pnpm <앱-이름>` 스크립트 추가
 - 린트 및 빌드 검증 실행 (desktop, mobile 제외)
 
+<br>
+
 ## 주요 명령어
 
 ```bash
@@ -120,6 +130,8 @@ pnpm my-web <명령어>        # 웹 패키지
 pnpm my-app <명령어>        # 모바일 패키지
 pnpm my-desktop <명령어>    # 데스크톱 패키지
 ```
+
+<br>
 
 ## 프로젝트 구조
 
@@ -152,6 +164,8 @@ scripts/
   create-app.ts          # 앱 생성 CLI 스크립트
 ```
 
+<br>
+
 ## 환경 변수
 
 루트 디렉토리의 `.env` 파일에서 모든 앱의 환경 변수를 관리합니다.
@@ -169,6 +183,8 @@ SWAGGER_PASSWORD=password
 
 > **참고**: 각 앱에서 `dotenv -e ../../.env` 또는 상대 경로로 루트 `.env`를 참조합니다.
 
+<br>
+
 ## 기술 스택
 
 | 분류     | 기술                               |
@@ -179,6 +195,8 @@ SWAGGER_PASSWORD=password
 | 모바일   | Expo 54, React Native 0.81         |
 | 데스크톱 | Electron 39, electron-forge        |
 | 언어     | TypeScript 5.9 (strict)            |
+
+<br>
 
 ## 참고
 
