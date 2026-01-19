@@ -125,6 +125,11 @@ function validateProjectName(name: string): { valid: boolean; error?: string } {
     return { valid: false, error: 'Project name is required' };
   }
 
+  // Allow "." for current directory
+  if (name === '.') {
+    return { valid: true };
+  }
+
   if (name.includes('..') || name.includes('/') || name.includes('\\')) {
     return { valid: false, error: 'Project name cannot contain path characters' };
   }
@@ -142,6 +147,16 @@ function validateProjectName(name: string): { valid: boolean; error?: string } {
   }
 
   return { valid: true };
+}
+
+function isDirectoryEmpty(dirPath: string): boolean {
+  if (!fs.existsSync(dirPath)) {
+    return true;
+  }
+  const files = fs.readdirSync(dirPath);
+  // Allow .git and other hidden files
+  const nonHiddenFiles = files.filter((f) => !f.startsWith('.'));
+  return nonHiddenFiles.length === 0;
 }
 
 function toKebabCase(str: string): string {
@@ -470,7 +485,7 @@ async function installDependencies(projectPath: string): Promise<boolean> {
   });
 }
 
-function printNextSteps(projectName: string, skipInstall: boolean): void {
+function printNextSteps(projectName: string, skipInstall: boolean, isCurrentDir = false): void {
   const kebabName = toKebabCase(projectName);
 
   console.log('');
@@ -478,7 +493,10 @@ function printNextSteps(projectName: string, skipInstall: boolean): void {
   console.log('');
   console.log(pc.bold('Next steps:'));
   console.log('');
-  console.log(`  ${pc.cyan('cd')} ${projectName}`);
+
+  if (!isCurrentDir) {
+    console.log(`  ${pc.cyan('cd')} ${projectName}`);
+  }
 
   if (skipInstall) {
     console.log(`  ${pc.cyan('pnpm')} install`);
@@ -560,24 +578,33 @@ async function main(): Promise<void> {
     projectName = response.projectName as string;
   }
 
-  const projectPath = path.resolve(process.cwd(), projectName);
+  // Handle "." for current directory
+  const isCurrentDir = projectName === '.';
+  const projectPath = isCurrentDir ? process.cwd() : path.resolve(process.cwd(), projectName);
+  const actualProjectName = isCurrentDir ? path.basename(projectPath) : projectName;
 
-  // Check if directory exists
-  if (fs.existsSync(projectPath)) {
+  // Check if directory exists and is not empty
+  if (isCurrentDir) {
+    if (!isDirectoryEmpty(projectPath)) {
+      console.error(pc.red('Error: Current directory is not empty'));
+      console.error(pc.dim('Hint: Use an empty directory or specify a new project name'));
+      process.exit(1);
+    }
+  } else if (fs.existsSync(projectPath)) {
     console.error(pc.red(`Error: Directory "${projectName}" already exists`));
     process.exit(1);
   }
 
   console.log('');
-  console.log(pc.bold(`Creating ${pc.cyan(projectName)}...`));
+  console.log(pc.bold(`Creating ${pc.cyan(actualProjectName)}${isCurrentDir ? ' in current directory' : ''}...`));
   console.log('');
 
   try {
     // Download template
     await downloadTemplate(projectPath);
 
-    // Update project name
-    updateProjectName(projectPath, projectName);
+    // Update project name (use actual name derived from directory)
+    updateProjectName(projectPath, actualProjectName);
 
     // Cleanup template files
     cleanupTemplate(projectPath);
@@ -588,7 +615,7 @@ async function main(): Promise<void> {
     }
 
     // Print next steps
-    printNextSteps(projectName, options.skipInstall);
+    printNextSteps(actualProjectName, options.skipInstall, isCurrentDir);
   } catch (error) {
     console.error(pc.red('Error:'), error instanceof Error ? error.message : error);
 
