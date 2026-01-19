@@ -20,6 +20,9 @@ on:
         type: boolean
         default: false
 
+permissions:
+  contents: write
+
 jobs:
   publish:
     # Run if: push to main OR manual trigger OR release with cli@ tag
