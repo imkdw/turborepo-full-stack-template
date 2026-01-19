@@ -26,6 +26,8 @@ This template creates a complete monorepo with:
 | `apps/<project-name>-app`     | Expo 54 mobile app      | -    |
 | `apps/<project-name>-desktop` | Electron desktop app    | -    |
 
+<br>
+
 ### Shared Packages
 
 - `@repo/ui` - Shared React components (CVA + Tailwind)
@@ -39,6 +41,8 @@ This template creates a complete monorepo with:
 - `@repo/exception` - Exception codes
 
 ## Usage
+
+<br>
 
 ### Interactive Mode
 
@@ -93,6 +97,8 @@ pnpm dev:mobile
 pnpm dev:desktop
 ```
 
+<br>
+
 ### Available Commands
 
 ```bash
@@ -105,6 +111,8 @@ pnpm check-types            # TypeScript type check
 pnpm test                   # Run all tests
 pnpm format                 # Prettier format all files
 ```
+
+<br>
 
 ### App-Specific Commands
 
