@@ -245,7 +245,7 @@ function replaceInFile(filePath: string, replacements: Map<string, string>): boo
     }
 
     return modified;
-  } catch (error) {
+  } catch {
     // Log error for debugging but don't fail the entire process
     console.log(pc.yellow('⚠') + ` Failed to process: ${path.basename(filePath)}`);
     return false;
