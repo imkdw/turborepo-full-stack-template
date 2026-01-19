@@ -16,6 +16,32 @@ const DEFAULT_PROJECT_NAME = 'my-turborepo';
 // Directories to exclude from processing
 const EXCLUDE_DIRS = ['node_modules', '.git', 'dist', '.next', '.turbo', '.expo'];
 
+// Binary file extensions to skip during replacement
+const BINARY_EXTENSIONS = [
+  '.png',
+  '.jpg',
+  '.jpeg',
+  '.gif',
+  '.ico',
+  '.webp',
+  '.svg',
+  '.woff',
+  '.woff2',
+  '.ttf',
+  '.eot',
+  '.otf',
+  '.mp3',
+  '.mp4',
+  '.wav',
+  '.pdf',
+  '.zip',
+  '.tar',
+  '.gz',
+];
+
+// Files to exclude from replacement (tsbuildinfo, lock files, etc.)
+const EXCLUDE_FILES = ['tsconfig.tsbuildinfo', 'pnpm-lock.yaml', 'package-lock.json', 'yarn.lock'];
+
 // =============================================================================
 // Types
 // =============================================================================
@@ -141,9 +167,31 @@ async function downloadTemplate(projectPath: string): Promise<void> {
     execSync(`npx tiged ${REPO_URL} "${projectPath}" --disable-cache`, {
       stdio: 'pipe',
     });
+
+    // Verify download was successful by checking for essential files
+    const essentialFiles = ['package.json', 'pnpm-workspace.yaml', 'turbo.json'];
+    const missingFiles = essentialFiles.filter((file) => !fs.existsSync(path.join(projectPath, file)));
+
+    if (missingFiles.length > 0) {
+      throw new Error(`Template download incomplete. Missing files: ${missingFiles.join(', ')}`);
+    }
+
     console.log(pc.green('✓') + ' Template downloaded');
   } catch (error) {
-    throw new Error(`Failed to download template: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+
+    // Provide more helpful error messages for common issues
+    if (errorMessage.includes('ENOTFOUND') || errorMessage.includes('network')) {
+      throw new Error('Network error: Unable to connect to GitHub. Please check your internet connection.');
+    }
+    if (errorMessage.includes('rate limit') || errorMessage.includes('403')) {
+      throw new Error('GitHub rate limit exceeded. Please try again later or use a GitHub token.');
+    }
+    if (errorMessage.includes('404') || errorMessage.includes('not found')) {
+      throw new Error(`Template repository not found: ${REPO_URL}`);
+    }
+
+    throw new Error(`Failed to download template: ${errorMessage}`);
   }
 }
 
@@ -165,7 +213,22 @@ function getAllFiles(dir: string, files: string[] = []): string[] {
   return files;
 }
 
+function isBinaryFile(filePath: string): boolean {
+  const ext = path.extname(filePath).toLowerCase();
+  return BINARY_EXTENSIONS.includes(ext);
+}
+
+function isExcludedFile(filePath: string): boolean {
+  const fileName = path.basename(filePath);
+  return EXCLUDE_FILES.includes(fileName);
+}
+
 function replaceInFile(filePath: string, replacements: Map<string, string>): boolean {
+  // Skip binary and excluded files
+  if (isBinaryFile(filePath) || isExcludedFile(filePath)) {
+    return false;
+  }
+
   try {
     let content = fs.readFileSync(filePath, 'utf-8');
     let modified = false;
@@ -182,7 +245,9 @@ function replaceInFile(filePath: string, replacements: Map<string, string>): boo
     }
 
     return modified;
-  } catch {
+  } catch (error) {
+    // Log error for debugging but don't fail the entire process
+    console.log(pc.yellow('⚠') + ` Failed to process: ${path.basename(filePath)}`);
     return false;
   }
 }
@@ -194,42 +259,88 @@ function updateProjectName(projectPath: string, projectName: string): void {
   const pascalName = toPascalCase(projectName);
 
   // Create replacement map
+  // Order matters: more specific patterns should come before general ones
   const replacements = new Map<string, string>([
-    // Package names
+    // ==========================================================================
+    // Template package names (templates use @repo/template-* naming)
+    // ==========================================================================
+    ['@repo/template-api', `@repo/${kebabName}-api`],
+    ['@repo/template-web', `@repo/${kebabName}-web`],
+    ['@repo/template-mobile', `@repo/${kebabName}-app`],
+    ['@repo/template-desktop', `@repo/${kebabName}-desktop`],
+
+    // ==========================================================================
+    // Standard package names (my-* naming in apps/)
+    // ==========================================================================
     ['my-monorepo', kebabName],
     ['@repo/my-api', `@repo/${kebabName}-api`],
     ['@repo/my-web', `@repo/${kebabName}-web`],
     ['@repo/my-app', `@repo/${kebabName}-app`],
     ['@repo/my-desktop', `@repo/${kebabName}-desktop`],
 
+    // ==========================================================================
     // Directory references
+    // ==========================================================================
     ['apps/my-api', `apps/${kebabName}-api`],
     ['apps/my-web', `apps/${kebabName}-web`],
     ['apps/my-app', `apps/${kebabName}-app`],
     ['apps/my-desktop', `apps/${kebabName}-desktop`],
 
-    // Docker container names
+    // ==========================================================================
+    // Docker container and database names
+    // ==========================================================================
+    // Test database name (more specific pattern first)
+    ['turborepo-template-postgres-test', `${kebabName}-postgres-test`],
+    // Main database/container name
     ['turborepo-template-postgres', `${kebabName}-postgres`],
 
-    // Expo app.json
+    // ==========================================================================
+    // Expo app.json patterns (both template-mobile and my-app)
+    // ==========================================================================
+    ['"name": "template-mobile"', `"name": "${kebabName}-app"`],
+    ['"slug": "template-mobile"', `"slug": "${kebabName}-app"`],
+    ['"scheme": "template-mobile"', `"scheme": "${kebabName}-app"`],
     ['"name": "my-app"', `"name": "${kebabName}-app"`],
     ['"slug": "my-app"', `"slug": "${kebabName}-app"`],
     ['"scheme": "my-app"', `"scheme": "${kebabName}-app"`],
 
-    // Electron productName
+    // ==========================================================================
+    // Electron productName patterns (both template-desktop and my-desktop)
+    // ==========================================================================
+    ['"productName": "template-desktop"', `"productName": "${pascalName}Desktop"`],
     ['"productName": "my-desktop"', `"productName": "${pascalName}Desktop"`],
 
+    // ==========================================================================
     // pnpm filter commands
+    // ==========================================================================
     ['pnpm my-api', `pnpm ${kebabName}-api`],
     ['pnpm my-web', `pnpm ${kebabName}-web`],
     ['pnpm my-app', `pnpm ${kebabName}-app`],
     ['pnpm my-desktop', `pnpm ${kebabName}-desktop`],
 
+    // ==========================================================================
     // Script names in root package.json
+    // ==========================================================================
     ['"my-api":', `"${kebabName}-api":`],
     ['"my-web":', `"${kebabName}-web":`],
     ['"my-app":', `"${kebabName}-app":`],
     ['"my-desktop":', `"${kebabName}-desktop":`],
+
+    // ==========================================================================
+    // CLAUDE.md template headers
+    // ==========================================================================
+    ['template-api (NestJS)', `${kebabName}-api (NestJS)`],
+    ['template-web (Next.js)', `${kebabName}-web (Next.js)`],
+    ['template-mobile (Expo)', `${kebabName}-app (Expo)`],
+    ['template-desktop (Electron)', `${kebabName}-desktop (Electron)`],
+
+    // ==========================================================================
+    // Generic template-* to kebab-* replacements (for any remaining references)
+    // ==========================================================================
+    ['template-api', `${kebabName}-api`],
+    ['template-web', `${kebabName}-web`],
+    ['template-mobile', `${kebabName}-app`],
+    ['template-desktop', `${kebabName}-desktop`],
   ]);
 
   // Get all files and update them
@@ -267,11 +378,19 @@ function updateProjectName(projectPath: string, projectName: string): void {
 function cleanupTemplate(projectPath: string): void {
   console.log(pc.cyan('→') + ' Cleaning up...');
 
-  // Remove template-specific files
+  // Remove template-specific files and directories
   const filesToRemove = [
+    // Template directories
     'templates',
     'scripts/create-app.ts',
     '.sisyphus',
+    '.claude',
+    // GitHub workflow for NPM publishing (specific to CLI package)
+    '.github/workflows/publish.yml',
+    // Lock file should be regenerated
+    'pnpm-lock.yaml',
+    // Build artifacts
+    'tsconfig.tsbuildinfo',
   ];
 
   for (const file of filesToRemove) {
@@ -287,12 +406,29 @@ function cleanupTemplate(projectPath: string): void {
     fs.rmSync(cliPackagePath, { recursive: true, force: true });
   }
 
-  // Update pnpm-workspace.yaml to remove templates
+  // Remove tsbuildinfo files from all subdirectories
+  const tsbuildInfoFiles = getAllFiles(projectPath).filter((f) => f.endsWith('.tsbuildinfo'));
+  for (const file of tsbuildInfoFiles) {
+    fs.rmSync(file, { force: true });
+  }
+
+  // Update pnpm-workspace.yaml to remove templates entry
   const workspacePath = path.join(projectPath, 'pnpm-workspace.yaml');
   if (fs.existsSync(workspacePath)) {
     let content = fs.readFileSync(workspacePath, 'utf-8');
-    content = content.replace(/\s*-\s*["']?templates\/\*["']?\s*/g, '');
-    fs.writeFileSync(workspacePath, content);
+    // Handle various YAML formatting styles:
+    // - "templates/*", - 'templates/*', - templates/*, - templates/**
+    content = content.replace(/^\s*-\s*["']?templates\/\*{1,2}["']?\s*$/gm, '');
+    // Remove empty lines left over
+    content = content.replace(/\n{3,}/g, '\n\n');
+    fs.writeFileSync(workspacePath, content.trim() + '\n');
+  }
+
+  // Create .env from .env.example if it exists
+  const envExamplePath = path.join(projectPath, '.env.example');
+  const envPath = path.join(projectPath, '.env');
+  if (fs.existsSync(envExamplePath) && !fs.existsSync(envPath)) {
+    fs.copyFileSync(envExamplePath, envPath);
   }
 
   // Initialize new git repository
