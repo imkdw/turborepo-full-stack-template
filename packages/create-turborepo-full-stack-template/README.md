@@ -10,9 +10,6 @@ npx create-turborepo-full-stack-template my-project
 
 # Using pnpx
 pnpx create-turborepo-full-stack-template my-project
-
-# Install in current directory
-npx create-turborepo-full-stack-template .
 ```
 
 ## What's Included
@@ -55,15 +52,6 @@ npx create-turborepo-full-stack-template
 ```bash
 npx create-turborepo-full-stack-template my-awesome-project
 ```
-
-### Install in Current Directory
-
-```bash
-# Create project in current (empty) directory
-npx create-turborepo-full-stack-template .
-```
-
-When using `.`, the directory name will be used as the project name.
 
 ### Skip Dependency Installation
 

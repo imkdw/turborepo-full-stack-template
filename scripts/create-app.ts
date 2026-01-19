@@ -5,10 +5,6 @@ import prompts from 'prompts';
 import ora, { type Ora } from 'ora';
 import pc from 'picocolors';
 
-// =============================================================================
-// Types & Interfaces
-// =============================================================================
-
 interface JsonUpdate {
   path: string;
   value: string | ((appName: string, context?: Record<string, unknown>) => string);
@@ -58,16 +54,11 @@ interface ExecutionContext {
   promptAnswers: Record<string, unknown>;
 }
 
-// =============================================================================
-// Constants
-// =============================================================================
-
 const ROOT_DIR = path.resolve(__dirname, '..');
 const TEMPLATES_DIR = path.join(ROOT_DIR, 'templates');
 const APPS_DIR = path.join(ROOT_DIR, 'apps');
 
 const RESERVED_NAMES = ['api', 'web', 'mobile', 'desktop'];
-
 const COMMON_EXCLUDE = ['node_modules', '.turbo', 'dist'];
 
 const TEMPLATES: Record<string, TemplateConfig> = {
@@ -76,9 +67,7 @@ const TEMPLATES: Record<string, TemplateConfig> = {
     source: path.join(TEMPLATES_DIR, 'mobile'),
     exclude: [...COMMON_EXCLUDE, '.expo'],
     jsonUpdates: {
-      'package.json': [
-        { path: 'name', value: (appName) => `@repo/${appName}` },
-      ],
+      'package.json': [{ path: 'name', value: (appName) => `@repo/${appName}` }],
       'app.json': [
         { path: 'expo.name', value: (appName) => appName },
         { path: 'expo.slug', value: (appName) => appName },
@@ -86,9 +75,7 @@ const TEMPLATES: Record<string, TemplateConfig> = {
       ],
     },
     textReplacements: {
-      'CLAUDE.md': [
-        { from: 'template-mobile', to: (appName) => appName },
-      ],
+      'CLAUDE.md': [{ from: 'template-mobile', to: (appName) => appName }],
     },
   },
   desktop: {
@@ -102,9 +89,7 @@ const TEMPLATES: Record<string, TemplateConfig> = {
       ],
     },
     textReplacements: {
-      'CLAUDE.md': [
-        { from: 'template-desktop', to: (appName) => appName },
-      ],
+      'CLAUDE.md': [{ from: 'template-desktop', to: (appName) => appName }],
     },
   },
   web: {
@@ -112,14 +97,10 @@ const TEMPLATES: Record<string, TemplateConfig> = {
     source: path.join(TEMPLATES_DIR, 'web'),
     exclude: [...COMMON_EXCLUDE, '.next'],
     jsonUpdates: {
-      'package.json': [
-        { path: 'name', value: (appName) => `@repo/${appName}` },
-      ],
+      'package.json': [{ path: 'name', value: (appName) => `@repo/${appName}` }],
     },
     textReplacements: {
-      'CLAUDE.md': [
-        { from: 'template-web', to: (appName) => appName },
-      ],
+      'CLAUDE.md': [{ from: 'template-web', to: (appName) => appName }],
     },
   },
   api: {
@@ -127,14 +108,10 @@ const TEMPLATES: Record<string, TemplateConfig> = {
     source: path.join(TEMPLATES_DIR, 'api'),
     exclude: [...COMMON_EXCLUDE],
     jsonUpdates: {
-      'package.json': [
-        { path: 'name', value: (appName) => `@repo/${appName}` },
-      ],
+      'package.json': [{ path: 'name', value: (appName) => `@repo/${appName}` }],
     },
     textReplacements: {
-      'CLAUDE.md': [
-        { from: 'template-api', to: (appName) => appName },
-      ],
+      'CLAUDE.md': [{ from: 'template-api', to: (appName) => appName }],
     },
     prompts: [
       {
@@ -147,20 +124,12 @@ const TEMPLATES: Record<string, TemplateConfig> = {
   },
 };
 
-// =============================================================================
-// Globals for cleanup
-// =============================================================================
-
 let currentSpinner: Ora | null = null;
 let rollbackState: RollbackState = {
   appFolderCreated: false,
   rootPackageJsonBackup: null,
 };
 let currentAppPath: string | null = null;
-
-// =============================================================================
-// Utility Functions
-// =============================================================================
 
 function printHelp(): void {
   console.log(`
@@ -230,18 +199,22 @@ function parseArgs(args: string[]): ParsedArgs {
   return result;
 }
 
+/**
+ * Validates app name against naming rules.
+ * - No path traversal characters (.., ./, /)
+ * - Length between 2-50 characters
+ * - Lowercase alphanumeric with hyphens, starting with a letter
+ * - Not a reserved name (api, web, mobile, desktop)
+ */
 function validateAppName(name: string): { valid: boolean; error?: string } {
-  // Check for path traversal
   if (name.includes('..') || name.includes('./') || name.includes('/')) {
     return { valid: false, error: 'App name cannot contain path characters' };
   }
 
-  // Check length
   if (name.length < 2 || name.length > 50) {
     return { valid: false, error: 'App name must be between 2 and 50 characters' };
   }
 
-  // Check format: lowercase alphanumeric with hyphens
   const validPattern = /^[a-z][a-z0-9]*(-[a-z0-9]+)*$/;
   if (!validPattern.test(name)) {
     return {
@@ -250,7 +223,6 @@ function validateAppName(name: string): { valid: boolean; error?: string } {
     };
   }
 
-  // Check reserved names
   if (RESERVED_NAMES.includes(name)) {
     return { valid: false, error: `"${name}" is a reserved name` };
   }
@@ -258,6 +230,10 @@ function validateAppName(name: string): { valid: boolean; error?: string } {
   return { valid: true };
 }
 
+/**
+ * Sets a value at a nested path in an object.
+ * @example setDeep(obj, 'expo.name', 'my-app') // obj.expo.name = 'my-app'
+ */
 function setDeep(obj: Record<string, unknown>, path: string, value: unknown): void {
   const parts = path.split('.');
   let current: Record<string, unknown> = obj;
@@ -274,10 +250,10 @@ function setDeep(obj: Record<string, unknown>, path: string, value: unknown): vo
   current[lastPart] = value;
 }
 
-// =============================================================================
-// Core Functions
-// =============================================================================
-
+/**
+ * Recursively copies a directory, excluding specified paths.
+ * @returns Number of files copied
+ */
 function copyDirectory(src: string, dest: string, exclude: string[]): number {
   let fileCount = 0;
 
@@ -308,7 +284,12 @@ function copyDirectory(src: string, dest: string, exclude: string[]): number {
   return fileCount;
 }
 
-function updateJsonFile(filePath: string, updates: JsonUpdate[], appName: string, context?: Record<string, unknown>): void {
+function updateJsonFile(
+  filePath: string,
+  updates: JsonUpdate[],
+  appName: string,
+  context?: Record<string, unknown>,
+): void {
   if (!fs.existsSync(filePath)) {
     return;
   }
@@ -339,6 +320,10 @@ function replaceInTextFile(filePath: string, replacements: TextReplacement[], ap
   fs.writeFileSync(filePath, content);
 }
 
+/**
+ * Adds a shortcut script to root package.json.
+ * @returns Original content for rollback
+ */
 function updateRootPackageJson(appName: string): string {
   const packageJsonPath = path.join(ROOT_DIR, 'package.json');
   const content = fs.readFileSync(packageJsonPath, 'utf-8');
@@ -362,44 +347,26 @@ function restoreRootPackageJson(backup: string): void {
   fs.writeFileSync(packageJsonPath, backup);
 }
 
+/**
+ * Scans existing Electron apps to find the highest used port,
+ * then returns the next available port pair for webpack dev server.
+ */
 function allocateDesktopPorts(): { port: number; loggerPort: number } {
   let maxPort = 9000;
 
-  // Scan apps directory for existing forge.config.ts files
-  const appsDir = APPS_DIR;
-  if (fs.existsSync(appsDir)) {
-    const entries = fs.readdirSync(appsDir, { withFileTypes: true });
+  const dirsToScan = [APPS_DIR, TEMPLATES_DIR];
+
+  for (const dir of dirsToScan) {
+    if (!fs.existsSync(dir)) continue;
+
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
     for (const entry of entries) {
       if (!entry.isDirectory()) continue;
 
-      const forgeConfigPath = path.join(appsDir, entry.name, 'forge.config.ts');
+      const forgeConfigPath = path.join(dir, entry.name, 'forge.config.ts');
       if (!fs.existsSync(forgeConfigPath)) continue;
 
       const content = fs.readFileSync(forgeConfigPath, 'utf-8');
-
-      // Match port: NNNN
-      const portMatch = content.match(/port:\s*(\d+)/);
-      if (portMatch) {
-        const port = parseInt(portMatch[1], 10);
-        if (port > maxPort) {
-          maxPort = port;
-        }
-      }
-    }
-  }
-
-  // Also scan templates directory
-  const templatesDir = TEMPLATES_DIR;
-  if (fs.existsSync(templatesDir)) {
-    const entries = fs.readdirSync(templatesDir, { withFileTypes: true });
-    for (const entry of entries) {
-      if (!entry.isDirectory()) continue;
-
-      const forgeConfigPath = path.join(templatesDir, entry.name, 'forge.config.ts');
-      if (!fs.existsSync(forgeConfigPath)) continue;
-
-      const content = fs.readFileSync(forgeConfigPath, 'utf-8');
-
       const portMatch = content.match(/port:\s*(\d+)/);
       if (portMatch) {
         const port = parseInt(portMatch[1], 10);
@@ -423,12 +390,8 @@ function updateDesktopForgeConfig(appPath: string, ports: { port: number; logger
   }
 
   let content = fs.readFileSync(forgeConfigPath, 'utf-8');
-
-  // Replace port value
   content = content.replace(/port:\s*\d+/, `port: ${ports.port}`);
-  // Replace loggerPort value
   content = content.replace(/loggerPort:\s*\d+/, `loggerPort: ${ports.loggerPort}`);
-
   fs.writeFileSync(forgeConfigPath, content);
 }
 
@@ -484,8 +447,11 @@ function runCommand(command: string, args: string[], cwd: string): Promise<{ suc
   });
 }
 
+/**
+ * Runs lint and build verification for the created app.
+ * Uses turbo for build to ensure workspace dependencies are built first.
+ */
 async function runVerification(appName: string, _appPath: string, template: string): Promise<boolean> {
-  // Run lint using pnpm -F from root directory for proper workspace resolution
   const lintSpinner = ora(`Running lint for ${appName}...`).start();
   currentSpinner = lintSpinner;
 
@@ -498,19 +464,15 @@ async function runVerification(appName: string, _appPath: string, template: stri
   }
   lintSpinner.succeed(`Lint passed for ${appName}`);
 
-  // Desktop template uses 'package' instead of 'build'
-  // Mobile template uses EAS build, so we skip build verification
   if (template === 'desktop' || template === 'mobile') {
     console.log(pc.dim(`Skipped: build verification (${template} uses ${template === 'desktop' ? 'package/make' : 'EAS Build'})`));
     currentSpinner = null;
     return true;
   }
 
-  // Run build for web and api using turbo to handle workspace dependencies
   const buildSpinner = ora(`Building ${appName}...`).start();
   currentSpinner = buildSpinner;
 
-  // Use turbo run build instead of direct pnpm -F to ensure workspace package dependencies are built first
   const buildResult = await runCommand('turbo', ['run', 'build', `--filter=@repo/${appName}`], ROOT_DIR);
   if (!buildResult.success) {
     buildSpinner.fail(`Build failed for ${appName}`);
@@ -527,7 +489,6 @@ async function runVerification(appName: string, _appPath: string, template: stri
 async function runInteractiveMode(): Promise<ExecutionContext | null> {
   console.log(`\n${pc.bold('Create a new app')}\n`);
 
-  // Select template
   const templateResponse = await prompts({
     type: 'select',
     name: 'template',
@@ -542,7 +503,6 @@ async function runInteractiveMode(): Promise<ExecutionContext | null> {
     return null;
   }
 
-  // Enter app name
   const nameResponse = await prompts({
     type: 'text',
     name: 'appName',
@@ -557,14 +517,12 @@ async function runInteractiveMode(): Promise<ExecutionContext | null> {
     return null;
   }
 
-  // Check if app already exists
   const appPath = path.join(APPS_DIR, nameResponse.appName);
   if (fs.existsSync(appPath)) {
     console.error(pc.red(`\nError: App "${nameResponse.appName}" already exists at ${appPath}`));
     return null;
   }
 
-  // Skip install option
   const installResponse = await prompts({
     type: 'confirm',
     name: 'runInstall',
@@ -576,7 +534,6 @@ async function runInteractiveMode(): Promise<ExecutionContext | null> {
     return null;
   }
 
-  // Template-specific prompts
   const templateConfig = TEMPLATES[templateResponse.template];
   const promptAnswers: Record<string, unknown> = {};
 
@@ -691,15 +648,12 @@ function printNextSteps(appName: string, template: string): void {
       break;
   }
 
-  // Manual checks section
   console.log(`\n${pc.bold(pc.yellow('⚠ Manual checks required:'))}`);
 
-  // Claude users
   console.log(`\n  ${pc.cyan('If using Claude Code:')}`);
   console.log(`    Check ${pc.bold('.claude/settings.local.json')} to allow commands for the new app`);
   console.log(`    ${pc.dim('Add "Bash(pnpm ' + appName + ' *)" to permissions.allow array')}`);
 
-  // Template-specific manual checks
   switch (template) {
     case 'mobile':
       console.log(`\n  ${pc.cyan('Mobile app setup:')}`);
@@ -739,7 +693,6 @@ function printNextSteps(appName: string, template: string): void {
       break;
   }
 
-  // Common checks for all templates
   console.log(`\n  ${pc.cyan('General:')}`);
   console.log(`    - Review and update ${pc.bold('apps/' + appName + '/CLAUDE.md')} for project-specific instructions`);
   console.log(`    - Check ${pc.bold('turbo.json')} if custom build/cache settings are needed`);
@@ -747,21 +700,15 @@ function printNextSteps(appName: string, template: string): void {
   console.log('');
 }
 
-// =============================================================================
-// Main Execution
-// =============================================================================
-
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
   const parsed = parseArgs(args);
 
-  // Handle --help
   if (parsed.help) {
     printHelp();
     process.exit(0);
   }
 
-  // Handle --list
   if (parsed.list) {
     printList();
     process.exit(0);
@@ -769,7 +716,6 @@ async function main(): Promise<void> {
 
   let context: ExecutionContext;
 
-  // Interactive mode if no arguments
   if (!parsed.appName && !parsed.from) {
     const interactiveResult = await runInteractiveMode();
     if (!interactiveResult) {
@@ -778,7 +724,6 @@ async function main(): Promise<void> {
     }
     context = interactiveResult;
   } else {
-    // CLI mode - validate arguments
     if (!parsed.appName) {
       console.error(pc.red('Error: App name is required'));
       console.error(pc.dim('Run "pnpm create-app --help" for usage'));
@@ -791,14 +736,12 @@ async function main(): Promise<void> {
       process.exit(1);
     }
 
-    // Validate template
     if (!TEMPLATES[parsed.from]) {
       console.error(pc.red(`Error: Unknown template "${parsed.from}"`));
       console.error(pc.dim('Run "pnpm create-app --list" to see available templates'));
       process.exit(1);
     }
 
-    // Validate app name
     const nameValidation = validateAppName(parsed.appName);
     if (!nameValidation.valid) {
       console.error(pc.red(`Error: ${nameValidation.error}`));
@@ -819,30 +762,25 @@ async function main(): Promise<void> {
   const appPath = path.join(APPS_DIR, appName);
   currentAppPath = appPath;
 
-  // Check if app already exists
   if (fs.existsSync(appPath)) {
     console.error(pc.red(`Error: App "${appName}" already exists at ${appPath}`));
     process.exit(1);
   }
 
-  // Check if template source exists
   if (!fs.existsSync(templateConfig.source)) {
     console.error(pc.red(`Error: Template source not found at ${templateConfig.source}`));
     console.error(pc.dim('Make sure templates have been set up correctly'));
     process.exit(1);
   }
 
-  // Dry run mode
   if (dryRun) {
     printDryRun(context);
     process.exit(0);
   }
 
-  // Start creation
   console.log(`\n${pc.bold('Creating')} ${pc.cyan(appName)} ${pc.bold('from')} ${pc.cyan(template)} ${pc.bold('template...')}\n`);
 
   try {
-    // 1. Copy template
     const copySpinner = ora('Copying template files...').start();
     currentSpinner = copySpinner;
 
@@ -851,7 +789,6 @@ async function main(): Promise<void> {
 
     copySpinner.succeed(`Copied ${fileCount} files`);
 
-    // 2. Update JSON files
     const jsonSpinner = ora('Updating configuration files...').start();
     currentSpinner = jsonSpinner;
 
@@ -862,7 +799,6 @@ async function main(): Promise<void> {
 
     jsonSpinner.succeed('Updated configuration files');
 
-    // 3. Text replacements
     const textSpinner = ora('Updating text files...').start();
     currentSpinner = textSpinner;
 
@@ -873,7 +809,6 @@ async function main(): Promise<void> {
 
     textSpinner.succeed('Updated text files');
 
-    // 4. Desktop port allocation (if applicable)
     if (template === 'desktop') {
       const portSpinner = ora('Allocating ports...').start();
       currentSpinner = portSpinner;
@@ -884,7 +819,6 @@ async function main(): Promise<void> {
       portSpinner.succeed(`Allocated ports: ${ports.port}, ${ports.loggerPort}`);
     }
 
-    // 5. Update root package.json
     const rootSpinner = ora('Updating root package.json...').start();
     currentSpinner = rootSpinner;
 
@@ -892,7 +826,6 @@ async function main(): Promise<void> {
 
     rootSpinner.succeed('Updated root package.json');
 
-    // 6. Run pnpm install
     if (!skipInstall) {
       const installSpinner = ora('Running pnpm install...').start();
       currentSpinner = installSpinner;
@@ -905,10 +838,26 @@ async function main(): Promise<void> {
         installSpinner.succeed('Installed dependencies');
       } catch {
         installSpinner.warn('pnpm install completed with warnings');
-        // Don't rollback on install failure, just warn
       }
 
-      // 7. Run verification
+      const myApiPath = path.join(APPS_DIR, 'my-api');
+      const prismaAppName = fs.existsSync(myApiPath) ? 'my-api' : template === 'api' ? appName : null;
+
+      if (prismaAppName) {
+        const prismaSpinner = ora('Generating Prisma client...').start();
+        currentSpinner = prismaSpinner;
+
+        try {
+          execSync(`pnpm ${prismaAppName} prisma generate`, {
+            cwd: ROOT_DIR,
+            stdio: ['ignore', 'ignore', 'ignore'],
+          });
+          prismaSpinner.succeed('Generated Prisma client');
+        } catch {
+          prismaSpinner.warn('Prisma generate completed with warnings');
+        }
+      }
+
       const verificationPassed = await runVerification(appName, appPath, template);
 
       if (!verificationPassed) {
@@ -924,7 +873,6 @@ async function main(): Promise<void> {
 
     currentSpinner = null;
 
-    // Print next steps
     printNextSteps(appName, template);
   } catch (error) {
     currentSpinner?.fail('An error occurred');
@@ -932,7 +880,6 @@ async function main(): Promise<void> {
 
     console.error(pc.red('\nError:'), error instanceof Error ? error.message : error);
 
-    // Attempt rollback
     if (rollbackState.appFolderCreated || rollbackState.rootPackageJsonBackup) {
       await rollback(rollbackState, appPath);
     }
@@ -940,10 +887,6 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 }
-
-// =============================================================================
-// Ctrl+C Handler
-// =============================================================================
 
 process.on('SIGINT', async () => {
   console.log(pc.yellow('\n\nInterrupted. Cleaning up...'));
@@ -956,10 +899,6 @@ process.on('SIGINT', async () => {
 
   process.exit(130);
 });
-
-// =============================================================================
-// Entry Point
-// =============================================================================
 
 main().catch((error) => {
   console.error(pc.red('Unexpected error:'), error);
