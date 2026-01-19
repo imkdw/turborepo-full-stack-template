@@ -506,11 +506,12 @@ async function runVerification(appName: string, _appPath: string, template: stri
     return true;
   }
 
-  // Run build for web and api
+  // Run build for web and api using turbo to handle workspace dependencies
   const buildSpinner = ora(`Building ${appName}...`).start();
   currentSpinner = buildSpinner;
 
-  const buildResult = await runCommand('pnpm', ['-F', `@repo/${appName}`, 'build'], ROOT_DIR);
+  // Use turbo run build instead of direct pnpm -F to ensure workspace package dependencies are built first
+  const buildResult = await runCommand('turbo', ['run', 'build', `--filter=@repo/${appName}`], ROOT_DIR);
   if (!buildResult.success) {
     buildSpinner.fail(`Build failed for ${appName}`);
     console.error(pc.red('\nBuild output:'));
