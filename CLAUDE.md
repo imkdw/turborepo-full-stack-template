@@ -4,21 +4,21 @@ This is a Turborepo monorepo with Next.js web frontend, NestJS backend API, Expo
 
 ## Quick Reference
 
-| App     | Location          | Port     | Run                |
-| ------- | ----------------- | -------- | ------------------ |
-| API     | `apps/my-api`     | 8000     | `pnpm dev`         |
-| Web     | `apps/my-web`     | 3000     | `pnpm dev`         |
-| Mobile  | `apps/my-app`     | -        | `pnpm dev:mobile`  |
-| Desktop | `apps/my-desktop` | -        | `pnpm dev:desktop` |
-| Swagger | -                 | 8000/api | Auto with API      |
+| App     | Location          | Port     | Run                   |
+| ------- | ----------------- | -------- | --------------------- |
+| API     | `apps/my-api`     | 8000     | `pnpm dev`            |
+| Web     | `apps/my-web`     | 3000     | `pnpm dev`            |
+| Mobile  | `apps/my-app`     | -        | `pnpm my-app start`   |
+| Desktop | `apps/my-desktop` | -        | `pnpm my-desktop dev` |
+| Swagger | -                 | 8000/api | Auto with API         |
 
 ## Commands
 
 ```bash
 # Development
 pnpm dev                    # Start API + Web (not mobile/desktop)
-pnpm dev:mobile             # Start mobile app separately
-pnpm dev:desktop            # Start desktop app separately
+pnpm my-app start           # Start mobile app separately
+pnpm my-desktop dev         # Start desktop app separately
 pnpm build                  # Build all packages
 pnpm lint                   # Lint with auto-fix
 pnpm check-types            # TypeScript type check
@@ -203,7 +203,7 @@ throw new CustomException({
 
 ### Building
 
-- Development: `pnpm dev:desktop` or `pnpm my-desktop dev`
+- Development: `pnpm my-desktop dev`
 - Package: `pnpm my-desktop package`
 - Make distributable: `pnpm my-desktop make`
 
@@ -307,7 +307,7 @@ SWAGGER_PASSWORD=xxx
 ## Performance Notes
 
 - Turborepo caches builds - use `turbo run build --force` to bypass
-- Dev excludes mobile and desktop by default (use `pnpm dev:mobile` or `pnpm dev:desktop` separately)
+- Dev excludes mobile and desktop by default (use `pnpm my-app start` or `pnpm my-desktop dev` separately)
 - Prisma client auto-generates on install
 
 ## Troubleshooting

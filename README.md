@@ -38,14 +38,14 @@ pnpm dev
 
 ### 필수 변경
 
-| 파일                                  | 변경 항목                                |
-| ------------------------------------- | ---------------------------------------- |
-| `package.json`                        | `name` 필드 (`my-monorepo` → 프로젝트명) |
-| `docker-compose.yml`                  | `container_name`, `POSTGRES_DB`          |
-| `.env`                                | `DATABASE_URL`의 DB명, 포트 등           |
-| `apps/my-api/prisma/schema/*.prisma`  | 실제 도메인 모델로 교체                  |
-| `apps/my-web/src/messages/*.json`     | i18n 메시지                              |
-| `apps/my-app/app.json`                | `name`, `slug`, `bundleIdentifier` 등    |
+| 파일                                 | 변경 항목                                |
+| ------------------------------------ | ---------------------------------------- |
+| `package.json`                       | `name` 필드 (`my-monorepo` → 프로젝트명) |
+| `docker-compose.yml`                 | `container_name`, `POSTGRES_DB`          |
+| `.env`                               | `DATABASE_URL`의 DB명, 포트 등           |
+| `apps/my-api/prisma/schema/*.prisma` | 실제 도메인 모델로 교체                  |
+| `apps/my-web/src/messages/*.json`    | i18n 메시지                              |
+| `apps/my-app/app.json`               | `name`, `slug`, `bundleIdentifier` 등    |
 
 <br>
 
@@ -107,8 +107,6 @@ pnpm create-app new-api --from api
 ```bash
 # 개발
 pnpm dev                # 웹 + API 개발 서버
-pnpm dev:mobile         # 모바일 앱 (별도 실행)
-pnpm dev:desktop        # 데스크톱 앱 (별도 실행)
 
 # 앱 생성
 pnpm create-app         # 새로운 앱 생성 (인터랙티브)
