@@ -475,8 +475,6 @@ function printNextSteps(projectName: string, skipInstall: boolean): void {
   console.log(pc.bold('Available commands:'));
   console.log('');
   console.log(`  ${pc.cyan('pnpm')} dev               ${pc.dim('# Start API + Web in dev mode')}`);
-  console.log(`  ${pc.cyan('pnpm')} dev:mobile        ${pc.dim('# Start Expo mobile app')}`);
-  console.log(`  ${pc.cyan('pnpm')} dev:desktop       ${pc.dim('# Start Electron desktop app')}`);
   console.log(`  ${pc.cyan('pnpm')} build             ${pc.dim('# Build all packages')}`);
   console.log(`  ${pc.cyan('pnpm')} lint              ${pc.dim('# Lint all packages')}`);
   console.log(`  ${pc.cyan('pnpm')} test              ${pc.dim('# Run all tests')}`);
