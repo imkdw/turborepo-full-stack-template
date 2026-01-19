@@ -2,9 +2,7 @@
   "name": "my-monorepo",
   "private": true,
   "scripts": {
-    "dev": "turbo run dev --filter=!@repo/my-app --filter=!@repo/my-desktop",
-    "dev:mobile": "pnpm --filter @repo/my-app dev",
-    "dev:desktop": "pnpm --filter @repo/my-desktop dev",
+    "dev": "turbo run dev",
 
     "build": "turbo run build",
     "lint": "turbo run lint -- --fix",
@@ -18,12 +16,7 @@
     "reset:test": "cd apps/my-api && pnpm dotenv -e ../../.env.test -- prisma db push --force-reset",
 
     "create-app": "tsx scripts/create-app.ts",
-    "prepare": "husky",
-
-    "my-api": "pnpm -F @repo/my-api",
-    "my-web": "pnpm -F @repo/my-web",
-    "my-app": "pnpm -F @repo/my-app",
-    "my-desktop": "pnpm -F @repo/my-desktop"
+    "prepare": "husky"
   },
   "devDependencies": {
     "@types/prompts": "^2.4.9",

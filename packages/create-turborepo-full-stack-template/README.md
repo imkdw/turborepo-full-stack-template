@@ -89,12 +89,6 @@ pnpm setup:local
 
 # Start development (API + Web)
 pnpm dev
-
-# Start mobile app (separate terminal)
-pnpm dev:mobile
-
-# Start desktop app (separate terminal)
-pnpm dev:desktop
 ```
 
 <br>
@@ -103,8 +97,6 @@ pnpm dev:desktop
 
 ```bash
 pnpm dev                    # Start API + Web (not mobile/desktop)
-pnpm dev:mobile             # Start mobile app separately
-pnpm dev:desktop            # Start desktop app separately
 pnpm build                  # Build all packages
 pnpm lint                   # Lint with auto-fix
 pnpm check-types            # TypeScript type check
@@ -120,8 +112,6 @@ pnpm format                 # Prettier format all files
 # Use pnpm <project-name>-<app> <command>
 pnpm my-project-api dev              # Start API only
 pnpm my-project-web dev              # Start Web only
-pnpm my-project-app start            # Start Mobile app
-pnpm my-project-desktop dev          # Start Desktop app
 pnpm my-project-api prisma studio    # Open Prisma Studio
 pnpm my-project-api prisma generate  # Generate Prisma client
 pnpm my-project-api prisma db push   # Push schema changes
