@@ -22,7 +22,6 @@ export default tseslint.config(
       'eslint.config.mjs',
       'forge.config.ts',
       'postcss.config.js',
-      'tailwind.config.ts',
       'webpack.*.ts',
     ],
     languageOptions: {

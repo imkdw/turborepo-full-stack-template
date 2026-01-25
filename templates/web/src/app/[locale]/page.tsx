@@ -45,7 +45,7 @@ function HomeContent(): ReactNode {
           </div>
 
           <div className="mb-10 space-y-3 md:mb-14 md:space-y-4">
-            <div className="rounded-xl border border-border bg-card p-4 shadow-sm md:p-5">
+            <div className="rounded-xl border border-border bg-card p-4 shadow-xs md:p-5">
               <div className="flex items-start gap-4">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-secondary md:h-12 md:w-12">
                   <Zap className="h-5 w-5 text-secondary-foreground md:h-6 md:w-6" />
@@ -57,7 +57,7 @@ function HomeContent(): ReactNode {
               </div>
             </div>
 
-            <div className="rounded-xl border border-border bg-card p-4 shadow-sm md:p-5">
+            <div className="rounded-xl border border-border bg-card p-4 shadow-xs md:p-5">
               <div className="flex items-start gap-4">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-secondary md:h-12 md:w-12">
                   <Blocks className="h-5 w-5 text-secondary-foreground md:h-6 md:w-6" />
@@ -69,7 +69,7 @@ function HomeContent(): ReactNode {
               </div>
             </div>
 
-            <div className="rounded-xl border border-border bg-card p-4 shadow-sm md:p-5">
+            <div className="rounded-xl border border-border bg-card p-4 shadow-xs md:p-5">
               <div className="flex items-start gap-4">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-secondary md:h-12 md:w-12">
                   <Smartphone className="h-5 w-5 text-secondary-foreground md:h-6 md:w-6" />

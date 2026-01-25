@@ -831,6 +831,12 @@ async function main(): Promise<void> {
       currentSpinner = installSpinner;
 
       try {
+        // pnpm 10 may skip installing new workspace packages if node_modules exists
+        // Delete root node_modules to force a fresh install that includes the new package
+        const nodeModulesPath = path.join(ROOT_DIR, 'node_modules');
+        if (fs.existsSync(nodeModulesPath)) {
+          fs.rmSync(nodeModulesPath, { recursive: true, force: true });
+        }
         execSync('pnpm install', {
           cwd: ROOT_DIR,
           stdio: ['ignore', 'ignore', 'ignore'],

@@ -24,7 +24,7 @@ export default function LocaleSwitcher(): ReactNode {
     <div className="inline-flex items-center gap-2">
       <Globe className="h-4 w-4 text-muted-foreground" />
       <select
-        className="rounded-md border border-border bg-background px-3 py-1.5 text-sm text-foreground transition-colors hover:border-primary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50"
+        className="rounded-md border border-border bg-background px-3 py-1.5 text-sm text-foreground transition-colors hover:border-primary focus:border-primary focus:outline-none focus:ring focus:ring-primary disabled:opacity-50"
         value={locale}
         disabled={isPending}
         onChange={e => handleChange(e.target.value)}
