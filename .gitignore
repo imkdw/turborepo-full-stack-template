@@ -51,5 +51,5 @@ templates/*/.webpack
 
 # Claude Code
 .claude/settings.local.json
-.omc/
-.sisyphus/
+.omc
+.sisyphus
