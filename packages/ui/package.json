@@ -11,8 +11,7 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
-    "./globals.css": "./src/styles/globals.css",
-    "./theme.css": "./src/styles/theme.css"
+    "./globals.css": "./src/styles/globals.css"
   },
   "scripts": {
     "build": "tsup",
