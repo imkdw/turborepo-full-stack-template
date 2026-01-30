@@ -405,12 +405,17 @@ function cleanupTemplate(projectPath: string): void {
     fs.copyFileSync(envExamplePath, envPath);
   }
 
-  // Initialize new git repository
-  try {
-    execSync('git init', { cwd: projectPath, stdio: 'ignore' });
-    console.log(pc.green('✓') + ' Initialized git repository');
-  } catch {
-    // Git might not be available
+  // Initialize new git repository (skip if .git already exists)
+  const gitDir = path.join(projectPath, '.git');
+  if (!fs.existsSync(gitDir)) {
+    try {
+      execSync('git init', { cwd: projectPath, stdio: 'ignore' });
+      console.log(pc.green('✓') + ' Initialized git repository');
+    } catch {
+      // Git might not be available
+    }
+  } else {
+    console.log(pc.green('✓') + ' Using existing git repository');
   }
 
   console.log(pc.green('✓') + ' Cleanup complete');
@@ -529,11 +534,12 @@ async function main(): Promise<void> {
 
   const projectPath = process.cwd();
 
-  // Ensure current directory is completely empty
-  const existingEntries = fs.readdirSync(projectPath);
+  // Ensure current directory is empty (allow .git directory)
+  const hasExistingGit = fs.existsSync(path.join(projectPath, '.git'));
+  const existingEntries = fs.readdirSync(projectPath).filter(entry => entry !== '.git');
   if (existingEntries.length > 0) {
     console.error(pc.red('Error: Current directory is not empty.'));
-    console.error(pc.dim('Run this command from an empty directory.'));
+    console.error(pc.dim('Run this command from an empty directory. (.git is allowed)'));
     process.exit(1);
   }
 
@@ -571,9 +577,10 @@ async function main(): Promise<void> {
     console.error(pc.red('Error:'), error instanceof Error ? error.message : error);
 
     // Clean up: remove all files we created in cwd
-    // Safe because we verified cwd was empty before starting
+    // Preserve .git if it existed before we started
     const cwdEntries = fs.readdirSync(projectPath);
     for (const entry of cwdEntries) {
+      if (entry === '.git' && hasExistingGit) continue;
       fs.rmSync(path.join(projectPath, entry), { recursive: true, force: true });
     }
 
