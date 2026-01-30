@@ -37,7 +37,7 @@ export class AllExceptionFilter implements ExceptionFilter {
 
     const responseBody: ExceptionResponse = {
       statusCode: httpStatus,
-      errorCode: exceptionResponse.errorCode || 'UNKNOWN_ERROR',
+      errorCode: exceptionResponse.errorCode,
       path: httpAdapter.getRequestUrl(ctx.getRequest()),
       stack: this.env === APP_ENV.LOCAL ? exceptionResponse.stack : undefined,
     };
