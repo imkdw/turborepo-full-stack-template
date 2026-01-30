@@ -4,13 +4,13 @@
 
 ## Quick Reference
 
-| Item           | Value                     |
-| -------------- | ------------------------- |
-| Framework      | NestJS 11                 |
-| ORM            | Prisma 6                  |
-| Port           | 8000                      |
-| Swagger        | http://localhost:8000/api |
-| API Versioning | URI (`/v1/...`)           |
+| Item           | Value                            |
+| -------------- | -------------------------------- |
+| Framework      | NestJS 11                        |
+| ORM            | Prisma 6 via @repo/server-shared |
+| Port           | 8000                             |
+| Swagger        | http://localhost:8000/api        |
+| API Versioning | URI (`/v1/...`)                  |
 
 ## Commands
 
@@ -25,10 +25,10 @@ pnpm test:unit              # Unit tests only
 pnpm test:integration       # Integration tests only (requires DB)
 pnpm test:e2e               # E2E tests (requires DB)
 
-# Database
-pnpm prisma studio          # Open Prisma Studio
-pnpm prisma generate        # Generate Prisma client
-pnpm prisma db push         # Push schema to DB
+# Database (Prisma는 @repo/server-shared에서 관리)
+# pnpm --filter @repo/server-shared prisma studio
+# pnpm --filter @repo/server-shared prisma generate
+# pnpm --filter @repo/server-shared prisma db push
 
 # Code Quality
 pnpm lint                   # ESLint with auto-fix
@@ -52,11 +52,6 @@ src/
   app.module.ts             # Root module
   app.controller.ts         # Health check endpoint
   main.ts                   # Bootstrap (CORS, Swagger, Helmet, etc.)
-
-prisma/
-  schema/
-    schema.prisma           # Prisma config + generator
-    user.prisma             # User model (example)
 
 test/
   unit/                     # Unit tests (no DB)
@@ -238,6 +233,6 @@ SWAGGER_PASSWORD=xxx              # Required for non-local
 
 ## Common Issues
 
-- **Prisma 타입 오류**: `pnpm prisma generate` 실행
+- **Prisma 타입 오류**: `pnpm --filter @repo/server-shared prisma generate` 실행
 - **DB 연결 실패**: Docker 컨테이너 확인 (`docker-compose up -d`)
 - **테스트 DB 오류**: `.env.test` 파일 확인

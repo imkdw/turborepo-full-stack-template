@@ -5,17 +5,17 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc --watch",
+    "build": "prisma generate && tsc",
+    "dev": "prisma generate --watch &  tsc --watch",
     "clean": "rm -rf dist",
-    "check-types": "tsc --noEmit",
+    "check-types": "prisma generate && tsc --noEmit",
     "lint": "eslint src/ --fix"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.0.1",
-    "@prisma/client": "^6.5.0",
+    "@prisma/client": "^6.15.0",
     "@repo/consts": "workspace:*",
     "@repo/exception": "workspace:*",
     "@repo/types": "workspace:*",
@@ -31,6 +31,10 @@
     "@types/express": "^5.0.0",
     "@types/node": "^22.13.0",
     "eslint": "^9.18.0",
+    "prisma": "^6.15.0",
     "typescript": "5.9.2"
+  },
+  "prisma": {
+    "schema": "prisma/schema"
   }
 }

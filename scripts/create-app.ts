@@ -131,14 +131,7 @@ const TEMPLATES: Record<string, TemplateConfig> = {
     textReplacements: {
       'CLAUDE.md': [{ from: 'template-api', to: appName => appName }],
     },
-    prompts: [
-      {
-        name: 'shareDatabase',
-        type: 'confirm',
-        message: 'Share database schema with existing API?',
-        initial: true,
-      },
-    ],
+    prompts: [],
   },
 };
 
@@ -675,7 +668,7 @@ function printNextSteps(appName: string, template: string): void {
     case 'api':
       console.log(`\n  ${pc.cyan('API app setup:')}`);
       console.log(`    - Set up ${pc.bold('.env')} file with DATABASE_URL and other required variables`);
-      console.log(`    - Run ${pc.dim('pnpm ' + appName + ' prisma db push')} to sync database schema`);
+      console.log(`    - Run ${pc.dim('pnpm --filter @repo/server-shared prisma db push')} to sync database schema`);
       console.log(`    - Update CORS origins in ${pc.bold('src/main.ts')} with your production domain`);
       console.log(`    - Update Swagger title/description in ${pc.bold('src/main.ts')}`);
       break;
@@ -829,26 +822,18 @@ async function main(): Promise<void> {
         installSpinner.warn('pnpm install completed with warnings');
       }
 
-      // Find existing API app with Prisma (instead of hardcoded 'my-api')
-      const existingApiApp = fs
-        .readdirSync(APPS_DIR, { withFileTypes: true })
-        .filter(e => e.isDirectory())
-        .find(e => fs.existsSync(path.join(APPS_DIR, e.name, 'prisma')));
-      const prismaAppName = existingApiApp?.name ?? (template === 'api' ? appName : null);
+      // Generate Prisma client via server-shared (where schema now lives)
+      const prismaSpinner = ora('Generating Prisma client...').start();
+      currentSpinner = prismaSpinner;
 
-      if (prismaAppName) {
-        const prismaSpinner = ora('Generating Prisma client...').start();
-        currentSpinner = prismaSpinner;
-
-        try {
-          execSync(`pnpm ${prismaAppName} prisma generate`, {
-            cwd: ROOT_DIR,
-            stdio: ['ignore', 'ignore', 'ignore'],
-          });
-          prismaSpinner.succeed('Generated Prisma client');
-        } catch {
-          prismaSpinner.warn('Prisma generate completed with warnings');
-        }
+      try {
+        execSync('pnpm --filter @repo/server-shared prisma generate', {
+          cwd: ROOT_DIR,
+          stdio: ['ignore', 'ignore', 'ignore'],
+        });
+        prismaSpinner.succeed('Generated Prisma client');
+      } catch {
+        prismaSpinner.warn('Prisma generate completed with warnings');
       }
 
       const verificationPassed = await runVerification(appName, appPath, template);

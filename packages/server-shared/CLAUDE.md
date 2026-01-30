@@ -18,13 +18,18 @@
 
 ```bash
 # 빌드
-pnpm build              # TypeScript 컴파일 → dist/
+pnpm build              # Prisma generate + TypeScript 컴파일 → dist/
 
 # 개발 모드
-pnpm dev                # Watch 모드 컴파일
+pnpm dev                # Prisma generate + Watch 모드 컴파일
 
 # 타입 체크
-pnpm check-types        # tsc --noEmit
+pnpm check-types        # Prisma generate + tsc --noEmit
+
+# Prisma
+pnpm prisma studio      # Prisma Studio 실행
+pnpm prisma generate    # Prisma 클라이언트 생성
+pnpm prisma db push     # 스키마를 DB에 반영
 
 # 린트
 pnpm lint               # ESLint 자동 수정
@@ -36,6 +41,10 @@ pnpm clean              # dist/ 폴더 삭제
 ## Project Structure
 
 ```
+prisma/
+└── schema/
+    ├── schema.prisma           # Prisma 설정 + generator
+    └── user.prisma             # User 모델
 src/
 ├── index.ts                    # 메인 배럴 export
 ├── config/                     # 설정 관리 모듈
@@ -93,11 +102,13 @@ export class SomeService {
 - `SWAGGER_USERNAME`: string (선택)
 - `SWAGGER_PASSWORD`: string (선택)
 
-### 2. Database Module
+### 2. Database Module (Prisma 소유)
+
+이 패키지가 Prisma 스키마의 소유자입니다. `prisma/schema/` 디렉토리에 스키마 파일이 있으며, 빌드 시 `prisma generate`가 먼저 실행됩니다. 모든 Prisma 타입(`User` 등)은 이 패키지에서 re-export됩니다.
 
 ```typescript
 // DatabaseModule - 전역 Prisma 모듈
-import { DatabaseModule, PrismaService } from '@repo/server-shared';
+import { DatabaseModule, PrismaService, User } from '@repo/server-shared';
 
 // PrismaService는 OnModuleInit, OnModuleDestroy 구현
 // 자동으로 연결/해제 관리

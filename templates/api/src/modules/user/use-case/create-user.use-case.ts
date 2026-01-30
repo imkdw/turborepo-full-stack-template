@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { User } from '@prisma/client';
+import { User } from '@repo/server-shared';
 import { PrismaService } from '@repo/server-shared';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { randomUUID } from 'crypto';

@@ -28,9 +28,9 @@ pnpm format                 # Prettier format all files
 
 # Database
 pnpm setup:local            # Start PostgreSQL
-pnpm <api-app> prisma studio   # Open Prisma Studio
-pnpm <api-app> prisma generate # Generate Prisma client
-pnpm <api-app> prisma db push  # Push schema changes
+pnpm --filter @repo/server-shared prisma studio   # Open Prisma Studio
+pnpm --filter @repo/server-shared prisma generate # Generate Prisma client
+pnpm --filter @repo/server-shared prisma db push  # Push schema changes
 
 # App Generator
 pnpm create-app <name> --from <template>  # Create new app from template
@@ -53,7 +53,6 @@ apps/                         # Empty by default — create apps with pnpm creat
     src/
       modules/              # Feature modules (use-case pattern)
       infra/                # Infrastructure (database, etc.)
-    prisma/schema/          # Prisma schema files
     test/                   # unit/, integration/, e2e/
   <web-app>/                  # Next.js 16 frontend (created from web template)
     src/
@@ -70,6 +69,7 @@ packages/
   typescript-config/        # TSConfig presets
   i18n/                     # Shared i18n config
   server-shared/            # NestJS shared (filters, interceptors, config)
+    prisma/schema/          # Prisma schema files
   shared/
     consts/                 # Shared constants
     types/                  # Shared TypeScript types
@@ -324,13 +324,13 @@ SWAGGER_PASSWORD=xxx
 
 ```bash
 docker-compose down && docker-compose up -d
-pnpm <api-app> prisma db push
+pnpm --filter @repo/server-shared prisma db push
 ```
 
 ### Type errors after package changes
 
 ```bash
-pnpm <api-app> prisma generate # Regenerate Prisma types
+pnpm --filter @repo/server-shared prisma generate # Regenerate Prisma types
 pnpm check-types            # Verify
 ```
 

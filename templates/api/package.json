@@ -12,9 +12,7 @@
     "test": "pnpm test:unit && pnpm test:integration",
     "test:unit": "jest --config test/unit/jest.config.ts",
     "test:integration": "jest --config test/integration/jest.config.ts",
-    "test:e2e": "dotenv -e ../../.env.test -- jest --config test/e2e/jest.config.ts",
-    "prisma": "dotenv -e ../../.env -- prisma",
-    "prisma:generate": "dotenv -e ../../.env -- prisma generate"
+    "test:e2e": "dotenv -e ../../.env.test -- jest --config test/e2e/jest.config.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
@@ -23,7 +21,6 @@
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/swagger": "^11.2.0",
     "@nestjs/throttler": "^6.5.0",
-    "@prisma/client": "^6.15.0",
     "@repo/consts": "workspace:*",
     "@repo/exception": "workspace:*",
     "@repo/server-shared": "workspace:*",
@@ -34,7 +31,6 @@
     "express-basic-auth": "^1.2.1",
     "helmet": "^8.1.0",
     "nest-winston": "^1.10.2",
-    "prisma": "^6.15.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
     "winston": "^3.18.3"
@@ -58,8 +54,5 @@
     "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
     "typescript": "5.9.2"
-  },
-  "prisma": {
-    "schema": "prisma/schema"
   }
 }

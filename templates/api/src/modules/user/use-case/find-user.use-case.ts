@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { User } from '@prisma/client';
+import { User } from '@repo/server-shared';
 import { PrismaService, UserNotFoundException } from '@repo/server-shared';
 
 @Injectable()
