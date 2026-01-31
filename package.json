@@ -12,7 +12,16 @@
     "setup:local": "docker-compose up -d --wait",
     "create-app": "tsx scripts/create-app.ts",
     "rename-scope": "tsx scripts/rename-scope.ts",
-    "prepare": "husky"
+    "prepare": "husky",
+    "server-shared": "pnpm --filter @repo/server-shared",
+    "eslint-config": "pnpm --filter @repo/eslint-config",
+    "i18n": "pnpm --filter @repo/i18n",
+    "typescript-config": "pnpm --filter @repo/typescript-config",
+    "ui": "pnpm --filter @repo/ui",
+    "consts": "pnpm --filter @repo/consts",
+    "exception": "pnpm --filter @repo/exception",
+    "types": "pnpm --filter @repo/types",
+    "utils": "pnpm --filter @repo/utils"
   },
   "devDependencies": {
     "@types/prompts": "^2.4.9",
