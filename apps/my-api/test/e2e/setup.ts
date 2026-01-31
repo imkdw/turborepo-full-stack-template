@@ -2,7 +2,10 @@ process.env.APP_ENV = 'test';
 
 import { INestApplication, ValidationPipe, VersioningType } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
+import { initEnv } from '@repo/server-shared';
 import { AppModule } from '@/app.module';
+
+initEnv();
 
 let app: INestApplication;
 

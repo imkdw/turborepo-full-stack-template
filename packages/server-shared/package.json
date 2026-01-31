@@ -10,16 +10,16 @@
     "clean": "rm -rf dist",
     "check-types": "prisma generate && tsc --noEmit",
     "lint": "eslint src/ --fix",
-    "prisma": "dotenv -e ../../.env -- prisma"
+    "prisma": "dotenv -e ../../.env.local -- prisma"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
-    "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.0.1",
     "@prisma/client": "^6.15.0",
     "@repo/consts": "workspace:*",
     "@repo/exception": "workspace:*",
     "@repo/types": "workspace:*",
+    "dotenv": "^17.2.3",
     "nest-winston": "^1.10.2",
     "rxjs": "^7.8.1",
     "winston": "^3.18.3",

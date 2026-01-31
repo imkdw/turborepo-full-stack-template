@@ -41,7 +41,8 @@ pnpm dev
 | 파일                                 | 변경 항목                                |
 | ------------------------------------ | ---------------------------------------- |
 | `package.json`                       | `name` 필드 (`my-monorepo` → 프로젝트명) |
-| `docker-compose.yml`                 | `container_name`, `POSTGRES_DB`          |
+| `docker-compose.local.yml`           | `container_name`, `POSTGRES_DB` (local)  |
+| `docker-compose.test.yml`            | `container_name`, `POSTGRES_DB` (test)   |
 | `.env`                               | `DATABASE_URL`의 DB명, 포트 등           |
 | `apps/my-api/prisma/schema/*.prisma` | 실제 도메인 모델로 교체                  |
 | `apps/my-web/src/messages/*.json`    | i18n 메시지                              |
@@ -170,7 +171,7 @@ scripts/
 
 ```bash
 # .env (루트 디렉토리)
-DATABASE_URL="postgresql://postgres:postgres@localhost:7432/turborepo-template-postgres?schema=public"
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/turborepo-template?schema=public"
 API_PORT=8000
 APP_ENV=local
 

@@ -49,8 +49,7 @@ src/
 ├── index.ts                    # 메인 배럴 export
 ├── config/                     # 설정 관리 모듈
 │   ├── index.ts
-│   ├── my-config.module.ts     # @Global() 설정 모듈
-│   ├── my-config.service.ts    # 타입 안전한 설정 접근
+│   ├── env.ts                  # 환경변수 싱글톤 (initEnv, env)
 │   └── my-config.schema.ts     # Zod 검증 스키마
 ├── database/                   # 데이터베이스 모듈
 │   ├── index.ts
@@ -81,19 +80,24 @@ src/
 ### 1. Configuration Module
 
 ```typescript
-// MyConfigModule - 전역 설정 모듈
-// .env 파일 로드 및 Zod 스키마로 검증
-import { MyConfigModule, MyConfigService } from '@repo/server-shared';
+// New: Direct env singleton access (RECOMMENDED)
+import { env, initEnv } from '@repo/server-shared';
 
-// 사용 예시
-@Injectable()
-export class SomeService {
-  constructor(private config: MyConfigService) {
-    const port = this.config.get('API_PORT');  // number 타입
-    const env = this.config.get('APP_ENV');    // AppEnv 타입
-  }
-}
+// Bootstrap에서 먼저 초기화
+initEnv();
+
+// 이후 어디서든 직접 접근
+const port = env.API_PORT;       // number 타입
+const appEnv = env.APP_ENV;      // AppEnv 타입
+const dbUrl = env.DATABASE_URL;  // string 타입
 ```
+
+**환경변수 로딩 순서:**
+- `.env.{APP_ENV}` 단일 파일만 로드 (e.g., `.env.local`, `.env.test`)
+
+**주요 함수:**
+- `initEnv()` - 환경변수 로드 및 Zod 검증 (멱등, bootstrap에서 호출)
+- `env` - 타입 안전한 Readonly proxy 객체
 
 **설정 스키마 (MyConfig):**
 - `DATABASE_URL`: string (필수)
@@ -178,7 +182,7 @@ const loggerConfig = createLoggerConfig(env, {
 - `@repo/types` - ExceptionResponse 인터페이스
 
 ### External Dependencies
-- `@nestjs/common`, `@nestjs/config`, `@nestjs/core`
+- `@nestjs/common`, `@nestjs/core`
 - `@prisma/client` - ORM
 - `nest-winston`, `winston` - 로깅
 - `zod` - 스키마 검증
@@ -220,26 +224,29 @@ export class CustomExceptionFilter implements ExceptionFilter {
 ## Usage in apps/api
 
 ```typescript
+// main.ts
+import { env, initEnv } from '@repo/server-shared';
+
+async function bootstrap() {
+  initEnv();
+  const app = await NestFactory.create(AppModule);
+  app.useGlobalFilters(new AllExceptionFilter(...));
+  app.useGlobalInterceptors(new LoggingInterceptor(...), new TransformInterceptor());
+  await app.listen(env.API_PORT);
+}
+
 // app.module.ts
 @Module({
-  imports: [MyConfigModule, DatabaseModule],
+  imports: [DatabaseModule],
 })
 export class AppModule {}
-
-// main.ts
-const app = await NestFactory.create(AppModule);
-app.useGlobalFilters(new AllExceptionFilter(...));
-app.useGlobalInterceptors(
-  new LoggingInterceptor(...),
-  new TransformInterceptor()
-);
 ```
 
 ## Exported API
 
 ```typescript
 // 메인 export (src/index.ts)
-export * from './config';       // MyConfigModule, MyConfigService, MyConfigSchema, MyConfig
+export * from './config';       // env, initEnv, MyConfig
 export * from './database';     // DatabaseModule, PrismaService
 export * from './exception';    // UserNotFoundException
 export * from './filter';       // AllExceptionFilter, CustomExceptionFilter, CustomException

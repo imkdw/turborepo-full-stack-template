@@ -211,12 +211,21 @@ describe('FindUserUseCase (Integration)', () => {
 
 ## Environment Variables
 
+```typescript
+// main.ts에서 initEnv() 호출 후 어디서든 사용
+import { env } from '@repo/server-shared';
+
+const port = env.API_PORT; // number
+const appEnv = env.APP_ENV; // AppEnv
+const dbUrl = env.DATABASE_URL; // string
+```
+
 ```bash
 DATABASE_URL=postgresql://...     # Required
 API_PORT=8000                     # Required
-APP_ENV=local|staging|production  # Required
-SWAGGER_USERNAME=xxx              # Required for non-local
-SWAGGER_PASSWORD=xxx              # Required for non-local
+APP_ENV=local|test|development|production  # Required
+SWAGGER_USERNAME=xxx              # Optional (required for non-local Swagger)
+SWAGGER_PASSWORD=xxx              # Optional (required for non-local Swagger)
 ```
 
 ## Adding New Feature Module
@@ -234,5 +243,5 @@ SWAGGER_PASSWORD=xxx              # Required for non-local
 ## Common Issues
 
 - **Prisma 타입 오류**: `pnpm --filter @repo/server-shared prisma generate` 실행
-- **DB 연결 실패**: Docker 컨테이너 확인 (`docker-compose up -d`)
+- **DB 연결 실패**: Docker 컨테이너 확인 (`docker-compose -f docker-compose.local.yml up -d`)
 - **테스트 DB 오류**: `.env.test` 파일 확인

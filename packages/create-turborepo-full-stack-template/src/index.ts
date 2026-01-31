@@ -293,12 +293,11 @@ function updateProjectName(projectPath: string, projectName: string): void {
     ['apps/my-desktop', `apps/${kebabName}-desktop`],
 
     // ==========================================================================
-    // Docker container and database names
+    // Docker database names (POSTGRES_DB in docker-compose files)
     // ==========================================================================
-    // Test database name (more specific pattern first)
-    ['turborepo-template-postgres-test', `${kebabName}-postgres-test`],
-    // Main database/container name
-    ['turborepo-template-postgres', `${kebabName}-postgres`],
+    // container_name is generic 'postgres' (not project-specific, no replacement needed).
+    // POSTGRES_DB is 'turborepo-template' — replaced to user's project name.
+    ['turborepo-template', kebabName],
 
     // ==========================================================================
     // Expo app.json patterns (both template-mobile and my-app)

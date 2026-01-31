@@ -1,23 +1,16 @@
 import { CallHandler, ExecutionContext, HttpStatus, Inject, Injectable, NestInterceptor } from '@nestjs/common';
-import { APP_ENV, AppEnv } from '@repo/consts';
+import { APP_ENV } from '@repo/consts';
 import { Request, Response } from 'express';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Observable, catchError, tap, throwError } from 'rxjs';
 import { Logger } from 'winston';
 
-import { MyConfigService } from '../config';
+import { env } from '../config';
 import { LOG_LEVEL, LogLevel } from '../logger';
 
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
-  private readonly env: AppEnv;
-
-  constructor(
-    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
-    private readonly configService: MyConfigService
-  ) {
-    this.env = this.configService.get('APP_ENV');
-  }
+  constructor(@Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
     const ctx = context.switchToHttp();
@@ -28,7 +21,7 @@ export class LoggingInterceptor implements NestInterceptor {
     const startTime = Date.now();
     const requestContext = `${method} ${url}`;
 
-    if (this.env === APP_ENV.LOCAL) {
+    if (env.APP_ENV === APP_ENV.LOCAL) {
       this.logger.debug(`Request started`, {
         context: requestContext,
         body,

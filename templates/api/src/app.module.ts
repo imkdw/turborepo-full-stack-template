@@ -8,26 +8,23 @@ import {
   createLoggerConfig,
   CustomExceptionFilter,
   DatabaseModule,
+  env,
   LoggingInterceptor,
-  MyConfigModule,
-  MyConfigService,
   TransformInterceptor,
 } from '@repo/server-shared';
 import { WinstonModule } from 'nest-winston';
 
 @Module({
   imports: [
-    MyConfigModule,
     DatabaseModule,
     UserModule,
     ThrottlerModule.forRoot({
       throttlers: [{ ttl: 60000, limit: 100 }],
     }),
     WinstonModule.forRootAsync({
-      useFactory: (configService: MyConfigService) => {
-        return createLoggerConfig(configService.get('APP_ENV'));
+      useFactory: () => {
+        return createLoggerConfig(env.APP_ENV);
       },
-      inject: [MyConfigService],
     }),
   ],
   controllers: [AppController],

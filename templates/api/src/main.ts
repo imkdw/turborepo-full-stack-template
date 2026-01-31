@@ -2,17 +2,17 @@ import { INestApplication, ValidationPipe, VersioningType } from '@nestjs/common
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { APP_ENV, AppEnv } from '@repo/consts';
-import { MyConfigService } from '@repo/server-shared';
+import { env, initEnv } from '@repo/server-shared';
 import expressBasicAuth from 'express-basic-auth';
 import helmet from 'helmet';
 
 import { AppModule } from './app.module';
 
-function getCorsConfig(env: AppEnv) {
+function getCorsConfig(appEnv: AppEnv) {
   // TODO: Replace 'your-domain.com' with your actual production domain
   const corsOrigins = [/^https?:\/\/your-domain\.com$/, /^https?:\/\/.*\.your-domain\.com$/];
 
-  if (env !== APP_ENV.PRODUCTION) {
+  if (appEnv !== APP_ENV.PRODUCTION) {
     corsOrigins.push(/^https?:\/\/localhost:([0-9]{1,5})$/);
     corsOrigins.push(/^https?:\/\/localhost$/);
   }
@@ -20,18 +20,18 @@ function getCorsConfig(env: AppEnv) {
   return { origin: corsOrigins, credentials: true };
 }
 
-function setupSwagger(app: INestApplication, configService: MyConfigService) {
-  const env = configService.get('APP_ENV');
+function setupSwagger(app: INestApplication) {
+  const appEnv = env.APP_ENV;
 
-  if (env === APP_ENV.PRODUCTION) {
+  if (appEnv === APP_ENV.PRODUCTION) {
     return;
   }
 
   const SWAGGER_PATH = 'api';
 
-  if (env !== APP_ENV.LOCAL) {
-    const username = configService.get('SWAGGER_USERNAME');
-    const password = configService.get('SWAGGER_PASSWORD');
+  if (appEnv !== APP_ENV.LOCAL) {
+    const username = env.SWAGGER_USERNAME;
+    const password = env.SWAGGER_PASSWORD;
 
     if (username && password) {
       app.use(
@@ -62,18 +62,19 @@ function setupSwagger(app: INestApplication, configService: MyConfigService) {
 }
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  const configService = app.get(MyConfigService);
+  initEnv();
 
-  const port = configService.get('API_PORT');
-  const env = configService.get('APP_ENV');
+  const app = await NestFactory.create(AppModule);
+
+  const port = env.API_PORT;
+  const appEnv = env.APP_ENV;
 
   app.enableVersioning({ type: VersioningType.URI, defaultVersion: '1' });
   app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
-  app.enableCors(getCorsConfig(env));
+  app.enableCors(getCorsConfig(appEnv));
   app.use(helmet());
 
-  setupSwagger(app, configService);
+  setupSwagger(app);
 
   await app.listen(port);
 }

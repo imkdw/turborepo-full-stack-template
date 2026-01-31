@@ -27,7 +27,8 @@ pnpm test                   # Run all tests
 pnpm format                 # Prettier format all files
 
 # Database
-pnpm setup:local            # Start PostgreSQL
+pnpm setup:local            # Start PostgreSQL (local)
+pnpm setup:test             # Start PostgreSQL (test)
 pnpm --filter @repo/server-shared prisma studio   # Open Prisma Studio
 pnpm --filter @repo/server-shared prisma generate # Generate Prisma client
 pnpm --filter @repo/server-shared prisma db push  # Push schema changes
@@ -68,8 +69,9 @@ packages/
   eslint-config/            # ESLint presets (base, nestjs, next)
   typescript-config/        # TSConfig presets
   i18n/                     # Shared i18n config
-  server-shared/            # NestJS shared (filters, interceptors, config)
+  server-shared/            # NestJS shared (filters, interceptors, env singleton)
     prisma/schema/          # Prisma schema files
+    src/env/                # Environment variable management (env.ts, initEnv())
   shared/
     consts/                 # Shared constants
     types/                  # Shared TypeScript types
@@ -117,6 +119,39 @@ scripts/
 - Newline after import block
 
 ## API Patterns (NestJS)
+
+### Environment Variables
+
+**IMPORTANT:** Use the `env` singleton from `@repo/server-shared` for all environment variable access.
+
+```typescript
+// ✅ CORRECT: Import and use env singleton
+import { env, initEnv } from '@repo/server-shared';
+
+// In main.ts bootstrap(), call initEnv() FIRST
+async function bootstrap() {
+  initEnv(); // Must be called before NestFactory.create
+
+  const app = await NestFactory.create(AppModule);
+  const port = env.API_PORT; // Direct property access
+  const appEnv = env.APP_ENV;
+  // ...
+}
+
+// In modules, import env directly
+import { env } from '@repo/server-shared';
+
+WinstonModule.forRootAsync({
+  useFactory: () => {
+    return createLoggerConfig(env.APP_ENV);
+  },
+});
+```
+
+**Key Points:**
+- Call `initEnv()` at the start of `bootstrap()` in `main.ts`
+- Use `env.VARIABLE_NAME` for direct access (no `.get()` method)
+- `env` is a singleton - safe to import anywhere
 
 ### Module Structure
 
@@ -233,25 +268,46 @@ pnpm <api-app> test:e2e        # Full HTTP tests
 
 ## Environment Variables
 
-Environment variables are centrally managed in the `.env` file at the root directory.
+Environment variables use a layered loading system based on `APP_ENV`:
 
-### .env (Root Directory)
-
+### File Convention
 ```bash
-DATABASE_URL=postgresql://postgres:postgres@localhost:7432/turborepo-template-postgres?schema=public
-API_PORT=8000
-APP_ENV=local|staging|production
-SWAGGER_USERNAME=xxx      # Required for non-local Swagger
-SWAGGER_PASSWORD=xxx
+.env.local        # Local development (APP_ENV=local)
+.env.test         # Test environment (APP_ENV=test)
+.env.development  # Development environment
+.env.production   # Production environment
 ```
 
-> Each app references the root `.env` using the `dotenv -e ../../.env` command.
+### Loading Order
+`.env.{APP_ENV}` 단일 파일만 로드 (e.g., `.env.local`, `.env.test`)
+
+### Usage in Code
+```typescript
+import { env, initEnv } from '@repo/server-shared';
+
+// Bootstrap에서 초기화 (main.ts, test setup)
+initEnv();
+
+// 이후 DI 없이 직접 접근
+const port = env.API_PORT;
+const dbUrl = env.DATABASE_URL;
+```
+
+### Available Variables
+```bash
+DATABASE_URL=postgresql://...     # Required
+API_PORT=8000                     # Required
+APP_ENV=local|test|development|production  # Required
+SWAGGER_USERNAME=xxx              # Optional (required for non-local Swagger)
+SWAGGER_PASSWORD=xxx              # Optional (required for non-local Swagger)
+```
 
 ### Database
 
-- PostgreSQL via Docker on port 7432
-- Container name: `turborepo-template-postgres`
-- Start: `docker-compose up -d`
+- PostgreSQL via Docker on port 5432
+- Container name: `postgres`
+- Start (local): `docker-compose -f docker-compose.local.yml up -d`
+- Start (test): `docker-compose -f docker-compose.test.yml up -d`
 
 ## Git Workflow
 
@@ -323,7 +379,7 @@ SWAGGER_PASSWORD=xxx
 ### Database connection issues
 
 ```bash
-docker-compose down && docker-compose up -d
+docker-compose -f docker-compose.local.yml down && docker-compose -f docker-compose.local.yml up -d
 pnpm --filter @repo/server-shared prisma db push
 ```
 

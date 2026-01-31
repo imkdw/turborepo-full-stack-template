@@ -7,10 +7,11 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: turborepo-template-postgres
+      POSTGRES_SCHEMA: public
+      POSTGRES_DB: turborepo-template
       POSTGRES_INITDB_ARGS: '--auth-host=scram-sha-256 --auth-local=scram-sha-256'
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U postgres -d turborepo-template-postgres']
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d turborepo-template']
       interval: 2s
       timeout: 5s
       retries: 10

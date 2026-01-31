@@ -1,23 +1,18 @@
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus, Inject } from '@nestjs/common';
 import { HttpAdapterHost } from '@nestjs/core';
-import { APP_ENV, AppEnv } from '@repo/consts';
+import { APP_ENV } from '@repo/consts';
 import { ExceptionResponse } from '@repo/types';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 
-import { MyConfigService } from '../config';
+import { env } from '../config';
 
 @Catch()
 export class AllExceptionFilter implements ExceptionFilter {
-  private readonly env: AppEnv;
-
   constructor(
     private readonly httpAdapterHost: HttpAdapterHost,
-    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
-    private readonly configService: MyConfigService
-  ) {
-    this.env = this.configService.get('APP_ENV');
-  }
+    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger
+  ) {}
 
   catch(exception: unknown, host: ArgumentsHost): void {
     const { httpAdapter } = this.httpAdapterHost;
@@ -39,7 +34,7 @@ export class AllExceptionFilter implements ExceptionFilter {
       statusCode: httpStatus,
       errorCode: exceptionResponse.errorCode,
       path: httpAdapter.getRequestUrl(ctx.getRequest()),
-      stack: this.env === APP_ENV.LOCAL ? exceptionResponse.stack : undefined,
+      stack: env.APP_ENV === APP_ENV.LOCAL ? exceptionResponse.stack : undefined,
     };
 
     this.logger.error('Exception occurred', {
