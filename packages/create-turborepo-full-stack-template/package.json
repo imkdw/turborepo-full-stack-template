@@ -1,6 +1,6 @@
 {
   "name": "create-turborepo-full-stack-template",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Create a full-stack Turborepo project with Next.js, NestJS, Expo, and Electron",
   "keywords": [
     "create",
