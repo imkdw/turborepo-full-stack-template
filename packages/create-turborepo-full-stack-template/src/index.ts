@@ -271,7 +271,8 @@ function updateProjectName(projectPath: string, projectName: string): void {
     // Template package names (templates use @repo/template-* naming)
     // ==========================================================================
     ['@repo/template-api', `@repo/${kebabName}-api`],
-    ['@repo/template-web', `@repo/${kebabName}-web`],
+    ['@repo/template-web-next', `@repo/${kebabName}-web`],
+    ['@repo/template-web-react', `@repo/${kebabName}-web-react`],
     ['@repo/template-mobile', `@repo/${kebabName}-app`],
     ['@repo/template-desktop', `@repo/${kebabName}-desktop`],
 
@@ -339,7 +340,8 @@ function updateProjectName(projectPath: string, projectName: string): void {
     // CLAUDE.md template headers
     // ==========================================================================
     ['template-api (NestJS)', `${kebabName}-api (NestJS)`],
-    ['template-web (Next.js)', `${kebabName}-web (Next.js)`],
+    ['template-web-next (Next.js)', `${kebabName}-web (Next.js)`],
+    ['template-web-react (Vite)', `${kebabName}-web-react (Vite)`],
     ['template-mobile (Expo)', `${kebabName}-app (Expo)`],
     ['template-desktop (Electron)', `${kebabName}-desktop (Electron)`],
 
@@ -347,7 +349,8 @@ function updateProjectName(projectPath: string, projectName: string): void {
     // Generic template-* to kebab-* replacements (for any remaining references)
     // ==========================================================================
     ['template-api', `${kebabName}-api`],
-    ['template-web', `${kebabName}-web`],
+    ['template-web-next', `${kebabName}-web`],
+    ['template-web-react', `${kebabName}-web-react`],
     ['template-mobile', `${kebabName}-app`],
     ['template-desktop', `${kebabName}-desktop`],
   ]);

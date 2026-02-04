@@ -73,18 +73,19 @@ pnpm create-app <앱-이름> --from <템플릿>
 
 # 예시
 pnpm create-app my-app --from mobile
-pnpm create-app admin-panel --from web
+pnpm create-app admin-panel --from web-next
 pnpm create-app new-api --from api
 ```
 
 **사용 가능한 템플릿**
 
-| 템플릿    | 설명                        |
-| --------- | --------------------------- |
-| `mobile`  | Expo React Native 모바일 앱 |
-| `desktop` | Electron 데스크톱 앱        |
-| `web`     | Next.js 웹 앱               |
-| `api`     | NestJS 백엔드 API           |
+| 템플릿       | 설명                           |
+| ------------ | ------------------------------ |
+| `mobile`     | Expo React Native 모바일 앱    |
+| `desktop`    | Electron 데스크톱 앱           |
+| `web-next`   | Next.js 웹 앱 (SSR/SSG)        |
+| `web-react`  | Vite + React 웹 앱 (SPA)       |
+| `api`        | NestJS 백엔드 API              |
 
 **옵션**
 
@@ -156,7 +157,8 @@ packages/
 templates/               # 앱 생성 CLI용 템플릿
   mobile/                # 모바일 앱 템플릿
   desktop/               # 데스크톱 앱 템플릿
-  web/                   # 웹 앱 템플릿
+  web-next/              # Next.js 웹 앱 템플릿
+  web-react/             # Vite + React 웹 앱 템플릿
   api/                   # API 템플릿
 
 scripts/

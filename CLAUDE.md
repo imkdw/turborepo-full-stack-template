@@ -6,12 +6,13 @@ This is a Turborepo monorepo with Next.js web frontend, NestJS backend API, Expo
 
 > **Note:** Apps are not included by default. Create them with `pnpm create-app`.
 
-| App     | Create with                              | Port |
-| ------- | ---------------------------------------- | ---- |
-| API     | `pnpm create-app <name> --from api`      | 8000 |
-| Web     | `pnpm create-app <name> --from web`      | 3000 |
-| Mobile  | `pnpm create-app <name> --from mobile`   | -    |
-| Desktop | `pnpm create-app <name> --from desktop`  | -    |
+| App           | Create with                                  | Port |
+| ------------- | -------------------------------------------- | ---- |
+| API           | `pnpm create-app <name> --from api`          | 8000 |
+| Web (Next.js) | `pnpm create-app <name> --from web-next`     | 3000 |
+| Web (Vite)    | `pnpm create-app <name> --from web-react`    | 3000 |
+| Mobile        | `pnpm create-app <name> --from mobile`       | -    |
+| Desktop       | `pnpm create-app <name> --from desktop`      | -    |
 
 ## Commands
 
@@ -81,7 +82,8 @@ packages/
 templates/                  # App templates for CLI generator
   mobile/                   # Mobile template (@repo/template-mobile)
   desktop/                  # Desktop template (@repo/template-desktop)
-  web/                      # Web template (@repo/template-web)
+  web-next/                 # Next.js template (@repo/template-web-next)
+  web-react/                # Vite + React template (@repo/template-web-react)
   api/                      # API template (@repo/template-api)
 
 scripts/
@@ -351,12 +353,13 @@ SWAGGER_PASSWORD=xxx              # Optional (required for non-local Swagger)
 
 1. Run `pnpm create-app` for interactive mode, or use CLI:
    ```bash
-   pnpm create-app my-new-app --from mobile   # mobile, desktop, web, api
+   pnpm create-app my-new-app --from mobile   # mobile, desktop, web-next, web-react, api
    ```
 2. Available templates:
    - `mobile` - Expo React Native mobile app
    - `desktop` - Electron desktop app
-   - `web` - Next.js web app
+   - `web-next` - Next.js web app (SSR/SSG)
+   - `web-react` - Vite + React web app (SPA)
    - `api` - NestJS backend API
 3. The generator will:
    - Copy template from `templates/`

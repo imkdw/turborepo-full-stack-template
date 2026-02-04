@@ -57,7 +57,7 @@ const ROOT_DIR = path.resolve(__dirname, '..');
 const TEMPLATES_DIR = path.join(ROOT_DIR, 'templates');
 const APPS_DIR = path.join(ROOT_DIR, 'apps');
 
-const RESERVED_NAMES = ['api', 'web', 'mobile', 'desktop'];
+const RESERVED_NAMES = ['api', 'web', 'web-next', 'web-react', 'mobile', 'desktop'];
 const COMMON_EXCLUDE = ['node_modules', '.turbo', 'dist'];
 
 function detectCurrentScope(): string {
@@ -110,15 +110,26 @@ const TEMPLATES: Record<string, TemplateConfig> = {
       'CLAUDE.md': [{ from: 'template-desktop', to: appName => appName }],
     },
   },
-  web: {
-    description: 'Next.js web app',
-    source: path.join(TEMPLATES_DIR, 'web'),
+  'web-next': {
+    description: 'Next.js web app (SSR/SSG)',
+    source: path.join(TEMPLATES_DIR, 'web-next'),
     exclude: [...COMMON_EXCLUDE, '.next'],
     jsonUpdates: {
       'package.json': [{ path: 'name', value: appName => `${SCOPE}/${appName}` }],
     },
     textReplacements: {
-      'CLAUDE.md': [{ from: 'template-web', to: appName => appName }],
+      'CLAUDE.md': [{ from: 'template-web-next', to: appName => appName }],
+    },
+  },
+  'web-react': {
+    description: 'React + Vite web app (SPA)',
+    source: path.join(TEMPLATES_DIR, 'web-react'),
+    exclude: [...COMMON_EXCLUDE],
+    jsonUpdates: {
+      'package.json': [{ path: 'name', value: appName => `${SCOPE}/${appName}` }],
+    },
+    textReplacements: {
+      'CLAUDE.md': [{ from: 'template-web-react', to: appName => appName }],
     },
   },
   api: {
@@ -148,7 +159,7 @@ ${pc.bold('Usage:')}
   pnpm create-app                              ${pc.dim('(interactive mode)')}
 
 ${pc.bold('Options:')}
-  --from, -f <template>  Template to use (mobile, desktop, web, api)
+  --from, -f <template>  Template to use (mobile, desktop, web-next, web-react, api)
   --dry-run              Preview changes without creating files
   --skip-install         Skip pnpm install after creation
   --list                 List available templates
@@ -615,9 +626,14 @@ function printNextSteps(appName: string, template: string): void {
       console.log(`  pnpm ${appName} package ${pc.dim('# Package the app')}`);
       console.log(`  pnpm ${appName} make    ${pc.dim('# Create distributable')}`);
       break;
-    case 'web':
+    case 'web-next':
       console.log(`  pnpm ${appName} dev     ${pc.dim('# Start Next.js dev server')}`);
       console.log(`  pnpm ${appName} build   ${pc.dim('# Production build')}`);
+      break;
+    case 'web-react':
+      console.log(`  pnpm ${appName} dev     ${pc.dim('# Start Vite dev server')}`);
+      console.log(`  pnpm ${appName} build   ${pc.dim('# Production build')}`);
+      console.log(`  pnpm ${appName} preview ${pc.dim('# Preview production build')}`);
       break;
     case 'api':
       console.log(`  pnpm ${appName} dev     ${pc.dim('# Start NestJS in watch mode')}`);
@@ -659,11 +675,17 @@ function printNextSteps(appName: string, template: string): void {
       console.log(`    ${pc.green(`"dev": "turbo dev --filter=!${SCOPE}/${appName}"`)}`);
       console.log(`    Run separately with: ${pc.green(`pnpm ${appName} dev`)}`);
       break;
-    case 'web':
-      console.log(`\n  ${pc.cyan('Web app setup:')}`);
+    case 'web-next':
+      console.log(`\n  ${pc.cyan('Web app setup (Next.js):')}`);
       console.log(`    - Update ${pc.bold('src/app/layout.tsx')} metadata (title, description)`);
       console.log(`    - Add i18n translations in ${pc.bold('src/messages/')} if using next-intl`);
       console.log(`    - Configure environment variables in ${pc.bold('.env.local')} if needed`);
+      break;
+    case 'web-react':
+      console.log(`\n  ${pc.cyan('Web app setup (Vite + React):')}`);
+      console.log(`    - Update ${pc.bold('index.html')} title and meta tags`);
+      console.log(`    - Configure environment variables in ${pc.bold('.env')} if needed`);
+      console.log(`    - Add routing with ${pc.dim('react-router-dom')} if needed`);
       break;
     case 'api':
       console.log(`\n  ${pc.cyan('API app setup:')}`);

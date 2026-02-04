@@ -1,0 +1,36 @@
+{
+  "name": "@repo/template-web-react",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --fix",
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@repo/consts": "workspace:*",
+    "@repo/types": "workspace:*",
+    "@repo/ui": "workspace:*",
+    "@repo/utils": "workspace:*",
+    "class-variance-authority": "^0.7.1",
+    "lucide-react": "^0.462.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^22.13.0",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^4.3.4",
+    "eslint": "^9.18.0",
+    "tailwindcss": "^4",
+    "typescript": "5.9.2",
+    "vite": "^6.0.7"
+  }
+}
