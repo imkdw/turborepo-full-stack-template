@@ -1,13 +1,15 @@
-import { nextJsConfig } from '@repo/eslint-config/next-js';
+import { config } from '@repo/eslint-config/react-internal';
 
 export default [
-  ...nextJsConfig,
+  ...config,
   {
     ignores: [
       'node_modules/**',
       'dist/**',
       'eslint.config.mjs',
       'postcss.config.mjs',
+      'vite.config.d.ts',
+      'vite.config.js',
     ],
   },
   {

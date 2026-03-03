@@ -4,13 +4,15 @@
 
 ## Quick Reference
 
-| Item      | Value                     |
-| --------- | ------------------------- |
-| Framework | React 19                  |
-| Bundler   | Vite 6                    |
-| Styling   | Tailwind CSS 4            |
-| Type      | SPA (Single Page App)     |
-| Port      | 3000                      |
+| Item             | Value                     |
+| ---------------- | ------------------------- |
+| Framework        | React 19                  |
+| Bundler          | Vite 6                    |
+| Styling          | Tailwind CSS 4            |
+| Type             | SPA (Single Page App)     |
+| Port             | 3000                      |
+| Data Fetching    | TanStack React Query v5   |
+| Toast            | Sonner v2                 |
 
 ## Commands
 
@@ -29,16 +31,22 @@ pnpm check-types            # TypeScript type check
 
 ```
 src/
-  components/               # React components
-  lib/                      # Utilities
-  App.tsx                   # Root component
-  main.tsx                  # Entry point
-  index.css                 # Global styles (Tailwind CSS 4)
+  app/                        # App-level setup
+    providers.tsx              # Provider hierarchy (React Query + Sonner)
+    query-devtools.tsx         # React Query DevTools (dev only)
+  components/                 # React components
+  lib/                        # Utilities
+    query-client.ts            # QueryClient factory + default options
+    api.ts                     # API functions (replace with real API)
+    demo.query-keys.ts         # Query key patterns (demo)
+  App.tsx                      # Root component
+  main.tsx                     # Entry point
+  index.css                    # Global styles (Tailwind CSS 4)
 
-public/                     # Static assets
-index.html                  # HTML template
-vite.config.ts              # Vite configuration
-postcss.config.mjs          # PostCSS + Tailwind config
+public/                       # Static assets
+index.html                    # HTML template
+vite.config.ts                # Vite configuration
+postcss.config.mjs            # PostCSS + Tailwind config
 ```
 
 ## Tailwind CSS 4 Configuration
@@ -96,6 +104,46 @@ import { cn } from '@repo/ui';
 <div className={cn('bg-background', isActive && 'bg-primary')} />
 ```
 
+### Data Fetching (React Query)
+
+```typescript
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+
+// Query keys pattern
+export const userQueryKeys = {
+  all: ['users'] as const,
+  list: () => ['users', 'list'] as const,
+  detail: (id: number) => ['users', 'detail', id] as const,
+};
+
+// useQuery
+const { data, isLoading } = useQuery({
+  queryKey: userQueryKeys.list(),
+  queryFn: fetchUsers,
+});
+
+// useMutation + toast
+const queryClient = useQueryClient();
+const mutation = useMutation({
+  mutationFn: createUser,
+  onSuccess: () => {
+    toast.success('저장되었습니다');
+    queryClient.invalidateQueries({ queryKey: userQueryKeys.all });
+  },
+});
+```
+
+### Toast Notifications (Sonner)
+
+```typescript
+import { toast } from 'sonner';
+
+toast.success('저장되었습니다');
+toast.error('오류가 발생했습니다');
+toast.info('정보 알림');
+toast.warning('주의가 필요합니다');
+```
+
 ## Code Style Rules
 
 - Path alias: `@/` → `src/` (e.g., `@/components/Button`)
@@ -135,8 +183,10 @@ createRoot(rootElement).render(
 
 ### Add State Management (Optional)
 
+React Query is already included for server state management. For client state:
+
 ```bash
-pnpm add zustand  # or jotai, @tanstack/react-query
+pnpm add zustand  # or jotai
 ```
 
 ### Add i18n (Optional)
